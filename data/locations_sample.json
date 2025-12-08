@@ -1,0 +1,116 @@
+{
+    "Parts_of_the_World": [
+        {
+            "name": "Europe",
+            "countries": [
+                {
+                    "name": "France",
+                    "cities": [
+                        "Paris",
+                        "Nancy"
+                    ]
+                },
+                {
+                    "name": "United Kingdom",
+                    "cities": [
+                        "London",
+                        "England"
+                    ]
+                },
+                {
+                    "name": "Germany",
+                    "cities": []
+                },
+                {
+                    "name": "Spain",
+                    "cities": []
+                },
+                {
+                    "name": "Ireland",
+                    "cities": []
+                },
+                {
+                    "name": "Croatia",
+                    "cities": []
+                },
+                {
+                    "name": "Belgium",
+                    "cities": []
+                }
+            ]
+        },
+        {
+            "name": "North America",
+            "countries": [
+                {
+                    "name": "United States",
+                    "cities": [
+                        "Los Angeles",
+                        "Hawaii",
+                        "Illinois",
+                        "Miami"
+                    ]
+                },
+                {
+                    "name": "Canada",
+                    "cities": []
+                },
+                {
+                    "name": "Puerto Rico",
+                    "cities": []
+                }
+            ]
+        },
+        {
+            "name": "South America",
+            "countries": [
+                {
+                    "name": "Brasil",
+                    "cities": [
+                        "Sao Paulo"
+                    ]
+                },
+                {
+                    "name": "Argentina",
+                    "cities": [
+                        "Buenos Aires"
+                    ]
+                },
+                {
+                    "name": "Columbia",
+                    "cities": []
+                }
+            ]
+        },
+        {
+            "name": "Asia",
+            "countries": [
+                {
+                    "name": "Indonesia",
+                    "cities": []
+                },
+                {
+                    "name": "South Korea",
+                    "cities": []
+                }
+            ]
+        },
+        {
+            "name": "Oceania",
+            "countries": [
+                {
+                    "name": "Australia",
+                    "cities": []
+                },
+                {
+                    "name": "New Zealand",
+                    "cities": []
+                }
+            ]
+        },
+        {
+            "name": "unknown",
+            "cities": []
+        }
+    ]
+}

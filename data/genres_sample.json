@@ -1,0 +1,546 @@
+{
+    "music": [
+        {
+            "supreme_genre": "Hip Hop & Rap",
+            "subgenres": [
+                {
+                    "name": "rap",
+                    "subgenres": [
+                        {
+                            "name": "trap",
+                            "subgenres": [
+                                {
+                                    "name": "trap latino",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "trap rap",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "mumble rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "emo rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "pop rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "country rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "cloud rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "rap francais",
+                            "subgenres": [
+                                {
+                                    "name": "french rap",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "rap fr",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "french hip-hop",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "deutschrap",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "hip hop",
+                    "subgenres": [
+                        {
+                            "name": "east coast rap",
+                            "subgenres": [
+                                {
+                                    "name": "east coast",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "west coast rap",
+                            "subgenres": [
+                                {
+                                    "name": "west coast",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "southern hip hop",
+                            "subgenres": [
+                                {
+                                    "name": "southern rap",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "dirty south",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "gangsta rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "underground hip-hop",
+                            "subgenres": [
+                                {
+                                    "name": "underground rap",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "alternative rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "experimental hip hop",
+                            "subgenres": [
+                                {
+                                    "name": "experimental rap",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "jazz rap",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "horrorcore",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "grime",
+                            "subgenres": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Rock",
+            "subgenres": [
+                {
+                    "name": "rock",
+                    "subgenres": [
+                        {
+                            "name": "alternative",
+                            "subgenres": [
+                                {
+                                    "name": "alternative rock",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "grunge",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "punk",
+                            "subgenres": [
+                                {
+                                    "name": "punk rock",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "pop punk",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "indie",
+                            "subgenres": [
+                                {
+                                    "name": "indie rock",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "classic rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "hard rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "glam rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "funk rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "psychedelic rock",
+                            "subgenres": [
+                                {
+                                    "name": "psychedelic",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "folk rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "progressive rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "britpop",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "comedy rock",
+                            "subgenres": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Pop",
+            "subgenres": [
+                {
+                    "name": "pop",
+                    "subgenres": [
+                        {
+                            "name": "indie pop",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "electropop",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "synthpop",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "art pop",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "pop rock",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "pop punk",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "k-pop",
+                            "subgenres": [
+                                {
+                                    "name": "kpop",
+                                    "subgenres": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "acoustic",
+                    "subgenres": []
+                },
+                {
+                    "name": "singer-songwriter",
+                    "subgenres": []
+                },
+                {
+                    "name": "boyband",
+                    "subgenres": []
+                },
+                {
+                    "name": "girl groups",
+                    "subgenres": []
+                }
+            ]
+        },
+        {
+            "supreme_genre": "R&B & Soul",
+            "subgenres": [
+                {
+                    "name": "rnb",
+                    "subgenres": [
+                        {
+                            "name": "r&b",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "alternative rnb",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "cloud rnb",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "prog-rnb",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "slow jams",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "soul",
+                    "subgenres": [
+                        {
+                            "name": "neo-soul",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "funk",
+                    "subgenres": []
+                },
+                {
+                    "name": "urban",
+                    "subgenres": []
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Electronic & Dance",
+            "subgenres": [
+                {
+                    "name": "electronic",
+                    "subgenres": [
+                        {
+                            "name": "electronica",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "dance",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "house",
+                            "subgenres": [
+                                {
+                                    "name": "electro house",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "techno",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "dubstep",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "downtempo",
+                            "subgenres": [
+                                {
+                                    "name": "chillout",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "trip-hop",
+                                    "subgenres": []
+                                },
+                                {
+                                    "name": "lo-fi",
+                                    "subgenres": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "industrial",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "noise",
+                            "subgenres": [
+                                {
+                                    "name": "rhythmic noise",
+                                    "subgenres": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Metal",
+            "subgenres": [
+                {
+                    "name": "heavy metal",
+                    "subgenres": [
+                        {
+                            "name": "metal",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "nu metal",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "power metal",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "folk metal",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "death metal",
+                    "subgenres": []
+                },
+                {
+                    "name": "black metal",
+                    "subgenres": []
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Latin",
+            "subgenres": [
+                {
+                    "name": "latin",
+                    "subgenres": [
+                        {
+                            "name": "reggaeton",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "chicha",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "cuban",
+                            "subgenres": [
+                                {
+                                    "name": "cuba",
+                                    "subgenres": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Jazz & Blues",
+            "subgenres": [
+                {
+                    "name": "jazz",
+                    "subgenres": [
+                        {
+                            "name": "vocal jazz",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "swing",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "blues",
+                    "subgenres": []
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Country & Folk",
+            "subgenres": [
+                {
+                    "name": "country",
+                    "subgenres": []
+                },
+                {
+                    "name": "folk",
+                    "subgenres": []
+                }
+            ]
+        },
+        {
+            "supreme_genre": "Other / Misc",
+            "subgenres": [
+                {
+                    "name": "experimental",
+                    "subgenres": []
+                },
+                {
+                    "name": "comedy",
+                    "subgenres": []
+                },
+                {
+                    "name": "christmas songs",
+                    "subgenres": [
+                        {
+                            "name": "christmas",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "holiday",
+                            "subgenres": []
+                        },
+                        {
+                            "name": "xmas",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "christian",
+                    "subgenres": []
+                },
+                {
+                    "name": "easy listening",
+                    "subgenres": [
+                        {
+                            "name": "easy-listening",
+                            "subgenres": []
+                        }
+                    ]
+                },
+                {
+                    "name": "disney",
+                    "subgenres": []
+                },
+                {
+                    "name": "go-go",
+                    "subgenres": []
+                }
+            ]
+        }
+    ]
+}
