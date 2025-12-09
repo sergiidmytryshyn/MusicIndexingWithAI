@@ -1,10 +1,17 @@
 import json
 from neo4j import GraphDatabase
-
+import torch
+from transformers import AutoModel
+from typing import List, Optional
+from tqdm import tqdm
 
 class GraphCreator:
     def __init__(self, uri, auth):
         self.driver = GraphDatabase.driver(uri, auth=auth)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model_name = "jinaai/jina-embeddings-v3"
+        self.model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
+        self.model.to(device)
 
     def close(self):
         self.driver.close()
@@ -132,6 +139,42 @@ class GraphCreator:
                         tx.run(query_city, country_name=country_name, city_name=city_name)
         
         GraphCreator._connect_to_earth(tx)
+
+    def get_embeddings(
+    self,
+    texts: List[str],
+    embedding_size: Optional[int] = None,
+    batch_size: int = 256
+) -> List[List[float]]:
+        """
+        Generate embeddings for a list of strings using jinaai/jina-embeddings-v3.
+        
+        Args:
+            texts: List of strings to embed
+            embedding_size: Optional embedding size. If provided, uses matryoshka encoding
+                            (truncate_dim) to return embeddings of the specified size.
+            batch_size: Batch size for processing texts (default: 32)
+        
+        Returns:
+            List of embeddings, where each embedding is a list of floats
+        """
+            
+        all_embeddings = []
+        
+        # Process texts in batches
+        for i in tqdm(range(0, len(texts), batch_size), desc="Embedding texts", total=len(texts) // batch_size):
+            batch_texts = texts[i:i + batch_size]
+            
+            # Use model's encode method with optional truncate_dim for matryoshka encoding
+            if embedding_size is not None:
+                batch_embeddings = self.model.encode(batch_texts, truncate_dim=embedding_size)
+            else:
+                batch_embeddings = self.model.encode(batch_texts)
+            
+            # Convert numpy arrays to list of lists of floats
+            all_embeddings.extend([emb.tolist() for emb in batch_embeddings])
+        
+        return all_embeddings
 
     def create_genres_tree(self, data):
         """Populates the genre database with the given data."""
