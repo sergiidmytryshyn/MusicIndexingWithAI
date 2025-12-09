@@ -5,13 +5,24 @@ from transformers import AutoModel
 from typing import List, Optional
 from tqdm import tqdm
 
+import random
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
 class GraphCreator:
     def __init__(self, uri, auth):
         self.driver = GraphDatabase.driver(uri, auth=auth)
+        self.driver.verify_connectivity()
+        print("Connection established successfully!")
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model_name = "jinaai/jina-embeddings-v3"
         self.model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
         self.model.to(device)
+        # self.model = None # DO NOT DELETE
 
     def close(self):
         self.driver.close()
@@ -40,6 +51,30 @@ class GraphCreator:
         clean_list = [name.strip('"') for name in raw_list]
         
         return clean_list
+
+    @staticmethod
+    def chunk_text(text: str, chunk_size: int = 500, overlap_ratio: float = 0.2) -> List[str]:
+        """Split text into overlapping chunks."""
+        if not text:
+            return []
+
+        overlap = int(chunk_size * overlap_ratio)
+        step = max(1, chunk_size - overlap)
+
+        chunks = []
+        start = 0
+        text_length = len(text)
+
+        while start < text_length:
+            chunk = text[start:start + chunk_size]
+            if not chunk:
+                break
+            chunks.append(chunk)
+            if len(chunk) < chunk_size:
+                break
+            start += step
+
+        return chunks
 
     @staticmethod
     def _process_subgenres(tx, child_genre, parent_name):
@@ -141,11 +176,11 @@ class GraphCreator:
         GraphCreator._connect_to_earth(tx)
 
     def get_embeddings(
-    self,
-    texts: List[str],
-    embedding_size: Optional[int] = None,
-    batch_size: int = 256
-) -> List[List[float]]:
+        self,
+        texts: List[str],
+        embedding_size: Optional[int] = None,
+        batch_size: int = 256,
+    ) -> List[List[float]]:
         """
         Generate embeddings for a list of strings using jinaai/jina-embeddings-v3.
         
@@ -158,7 +193,9 @@ class GraphCreator:
         Returns:
             List of embeddings, where each embedding is a list of floats
         """
-            
+        # fake_embedding = [[random.uniform(0, 1) for _ in range(embedding_size)] for i in texts]
+        # return fake_embedding
+
         all_embeddings = []
         
         # Process texts in batches
@@ -196,6 +233,53 @@ class GraphCreator:
 
         with self.driver.session() as session:
             session.execute_write(self._create_nodes, track_data)
+
+            artist_data = track_data.get('artist', {})
+            artist_name = artist_data.get('name', track_data.get('artist_name', ''))
+            description_text = artist_data.get('description', '')
+            lyrics_text = track_data.get('lyrics', '')
+            track_id = track_data.get('id')
+
+            # Added lyrics and description embedding insertion
+            # Description embeddings (256 dims) 
+            if description_text and artist_name:
+                desc_chunks = self.chunk_text(description_text, chunk_size=500, overlap_ratio=0.2)
+                desc_embeddings = self.get_embeddings(desc_chunks, embedding_size=256)
+                desc_payload = [
+                    {
+                        "id": f"desc_emb_{artist_name}_{idx}",
+                        "vector": emb,
+                        "number": idx
+                    }
+                    for idx, emb in enumerate(desc_embeddings)
+                ]
+                if desc_payload:
+                    session.execute_write(
+                        self._store_embeddings,
+                        "Description",
+                        f"desc_{artist_name}",
+                        desc_payload
+                    )
+
+            # Lyrics embeddings (128 dims)
+            if lyrics_text and track_id:
+                lyrics_chunks = self.chunk_text(lyrics_text, chunk_size=500, overlap_ratio=0.2)
+                lyrics_embeddings = self.get_embeddings(lyrics_chunks, embedding_size=128)
+                lyrics_payload = [
+                    {
+                        "id": f"lyrics_emb_{track_id}_{idx}",
+                        "vector": emb,
+                        "number": idx
+                    }
+                    for idx, emb in enumerate(lyrics_embeddings)
+                ]
+                if lyrics_payload:
+                    session.execute_write(
+                        self._store_embeddings,
+                        "Lyrics",
+                        f"lyrics_{track_id}",
+                        lyrics_payload
+                    )
 
     @staticmethod
     def _create_nodes(tx, data):
@@ -341,17 +425,45 @@ class GraphCreator:
             tag=data.get('tag', 'unknown').lower(),
             features=data.get('parsed_features', [])
         )
+
+    @staticmethod
+    def _store_embeddings(tx, target_label: str, target_id: str, embeddings: List[dict]):
+        """
+        Store embeddings and link them to the target node.
+        Expects each embedding dict to have keys: id, vector (list of floats), number.
+        """
+        if target_label not in {"Lyrics", "Description"}:
+            return
+
+        query = f"""
+        UNWIND $embeddings AS emb
+        MERGE (e:Embedding {{id: emb.id}})
+        SET e.vector = emb.vector,
+            e.number = emb.number
+        WITH e
+        MATCH (t:{target_label} {{id: $target_id}})
+        MERGE (t)-[:HAS_EMBEDDING]->(e)
+        """
+        tx.run(query, target_id=target_id, embeddings=embeddings)
     
 
 if __name__ == "__main__":
-    URI = "bolt://localhost:7687"
-    AUTH = ("neo4j", "password")
+    TRACKS_TO_ADD = 100
 
     dataset_path = "../data_parsing/data/ds2_merged_10000.json"
     genres_hieararchy_path = "../data/genres_sample.json"
     locations_hieararchy_path = "../data/locations_sample.json"
 
-    creator = GraphCreator(URI, AUTH)
+    uri = os.environ.get("NEO4J_URI")
+    username = os.environ.get("NEO4J_USERNAME")
+    password = os.environ.get("NEO4J_PASSWORD")
+    
+    if not all([uri, username, password]):
+        raise ValueError("Neo4j connection environment variables not set.")
+
+    auth = (username, password)
+    
+    creator = GraphCreator(uri, auth)
 
     try:
         data = creator.read_json(dataset_path)["songs"]
@@ -363,7 +475,7 @@ if __name__ == "__main__":
 
         print("Starting import...")
 
-        for track in data[:1000]:
+        for track in data[:TRACKS_TO_ADD]:
             creator.import_track(track)
             print(f"Imported: {track['title']}")
     finally:
