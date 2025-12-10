@@ -4,7 +4,7 @@ import torch
 from transformers import AutoModel
 from typing import List, Optional
 from tqdm import tqdm
-
+import re
 import random
 import os
 from dotenv import load_dotenv
@@ -14,6 +14,8 @@ load_dotenv()
 
 class GraphCreator:
     def __init__(self, uri, auth):
+        uri = "bolt://localhost:7687"
+        auth = ("neo4j", "password")
         self.driver = GraphDatabase.driver(uri, auth=auth)
         self.driver.verify_connectivity()
         print("Connection established successfully!")
@@ -23,6 +25,8 @@ class GraphCreator:
         self.model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
         self.model.to(device)
         # self.model = None # DO NOT DELETE
+        self.embedding_lyric_dim = 128
+        self.embedding_description_dim = 256
 
     def close(self):
         self.driver.close()
@@ -34,23 +38,15 @@ class GraphCreator:
 
     @staticmethod
     def parse_features_string(feature_str):
-        """
-        Parses strings like: '{"Stefflon Don"}', '{}', '{"French Montana","Yung Fliiboy"}'
-        Returns a list of names.
-        """
-        if not feature_str or feature_str == '{}':
+        clean_str = feature_str.strip("{}")
+        if not clean_str:
             return []
-        
-        # Remove outer curly braces
-        content = feature_str.strip('{}')
-        
-        if not content:
-            return []
-        raw_list = content.split('","')
-        
-        clean_list = [name.strip('"') for name in raw_list]
-        
-        return clean_list
+        clean_str = re.sub(r"\\+", "", clean_str)        
+        clean_str = clean_str.replace('"', '')
+
+        final_list = clean_str.split(",")
+        return final_list
+    
 
     @staticmethod
     def chunk_text(text: str, chunk_size: int = 500, overlap_ratio: float = 0.2) -> List[str]:
@@ -193,8 +189,8 @@ class GraphCreator:
         Returns:
             List of embeddings, where each embedding is a list of floats
         """
-        # fake_embedding = [[random.uniform(0, 1) for _ in range(embedding_size)] for i in texts]
-        # return fake_embedding
+        fake_embedding = [[random.uniform(0, 1) for _ in range(embedding_size)] for i in texts]
+        return fake_embedding
 
         all_embeddings = []
         
@@ -244,7 +240,7 @@ class GraphCreator:
             # Description embeddings (256 dims) 
             if description_text and artist_name:
                 desc_chunks = self.chunk_text(description_text, chunk_size=500, overlap_ratio=0.2)
-                desc_embeddings = self.get_embeddings(desc_chunks, embedding_size=256)
+                desc_embeddings = self.get_embeddings(desc_chunks, embedding_size=self.embedding_description_dim)
                 desc_payload = [
                     {
                         "id": f"desc_emb_{artist_name}_{idx}",
@@ -264,7 +260,7 @@ class GraphCreator:
             # Lyrics embeddings (128 dims)
             if lyrics_text and track_id:
                 lyrics_chunks = self.chunk_text(lyrics_text, chunk_size=500, overlap_ratio=0.2)
-                lyrics_embeddings = self.get_embeddings(lyrics_chunks, embedding_size=128)
+                lyrics_embeddings = self.get_embeddings(lyrics_chunks, embedding_size=self.embedding_lyric_dim)
                 lyrics_payload = [
                     {
                         "id": f"lyrics_emb_{track_id}_{idx}",
@@ -322,11 +318,16 @@ class GraphCreator:
         RETURN g
         """
         fake_tags = ['non_existing_genre']
+        try:
+            founded_year=int(artist_data.get('founded_year').strip())
+        except Exception as e:
+            founded_year=-1
+
         tx.run(query_artist, 
             artist_name=artist_data.get('name', data.get('artist_name')),
             artist_mbid=artist_data.get('mbid'),
             artist_url=artist_data.get('url'),
-            founded_year=artist_data.get('founded_year'),
+            founded_year=founded_year,
             artist_desc=artist_data.get('description', ''),
             founded_place=artist_data.get('founded_place', ''),
             artist_tags=fake_tags
@@ -434,10 +435,10 @@ class GraphCreator:
         """
         if target_label not in {"Lyrics", "Description"}:
             return
-
+        embedding_type = "EmbeddingDescription" if target_label == "Description" else "EmbeddingLyrics"
         query = f"""
         UNWIND $embeddings AS emb
-        MERGE (e:Embedding {{id: emb.id}})
+        MERGE (e:{embedding_type} {{id: emb.id}})
         SET e.vector = emb.vector,
             e.number = emb.number
         WITH e
@@ -445,12 +446,91 @@ class GraphCreator:
         MERGE (t)-[:HAS_EMBEDDING]->(e)
         """
         tx.run(query, target_id=target_id, embeddings=embeddings)
-    
+
+
+
+    def create_indexes(self):
+        commands = [
+            # --- UNIQUE CONSTRAINTS (For Data Integrity) ---
+            # Reference Data (Name must be unique)
+            "CALL apoc.schema.assert({}, {}, true)",
+            "CREATE CONSTRAINT genre_uniq IF NOT EXISTS FOR (g:Genre) REQUIRE g.name IS UNIQUE",
+            "CREATE CONSTRAINT region_uniq IF NOT EXISTS FOR (r:Region) REQUIRE r.name IS UNIQUE",
+            "CREATE CONSTRAINT country_uniq IF NOT EXISTS FOR (c:Country) REQUIRE c.name IS UNIQUE",
+            "CREATE CONSTRAINT city_uniq IF NOT EXISTS FOR (c:City) REQUIRE c.name IS UNIQUE",
+            "CREATE CONSTRAINT planet_uniq IF NOT EXISTS FOR (p:Planet) REQUIRE p.name IS UNIQUE",
+
+            # Entity IDs (Critical for merging and matching)
+            "CREATE CONSTRAINT artist_mbid_uniq IF NOT EXISTS FOR (a:Artist) REQUIRE a.mbid IS UNIQUE",
+            "CREATE CONSTRAINT album_mbid_uniq IF NOT EXISTS FOR (a:Album) REQUIRE a.mbid IS UNIQUE",
+            "CREATE CONSTRAINT track_id_uniq IF NOT EXISTS FOR (t:Track) REQUIRE t.id IS UNIQUE",
+            "CREATE CONSTRAINT lyrics_id_uniq IF NOT EXISTS FOR (l:Lyrics) REQUIRE l.id IS UNIQUE",
+            "CREATE CONSTRAINT desc_id_uniq IF NOT EXISTS FOR (d:Description) REQUIRE d.id IS UNIQUE",
+            "CREATE CONSTRAINT embed_desc_id_uniq IF NOT EXISTS FOR (e:EmbeddingDescription) REQUIRE e.id IS UNIQUE",
+            "CREATE CONSTRAINT embed_lyr_id_uniq IF NOT EXISTS FOR (e:EmbeddingLyrics) REQUIRE e.id IS UNIQUE",
+
+            # --- REGULAR INDEXES (For Performance & Sorting) ---
+            # Lookups by Name/Title (Non-unique)
+            # "CREATE INDEX artist_name_idx IF NOT EXISTS FOR (a:Artist) ON (a.name)",
+            # "CREATE INDEX album_name_idx IF NOT EXISTS FOR (a:Album) ON (a.name)",
+            # "CREATE INDEX track_title_idx IF NOT EXISTS FOR (t:Track) ON (t.title)",
+
+            "CREATE FULLTEXT INDEX lyrics_fulltext IF NOT EXISTS FOR (l:Lyrics) ON EACH [l.text];",
+
+            "CREATE FULLTEXT INDEX desc_fulltext IF NOT EXISTS FOR (d:Description) ON EACH [d.text];",
+
+            "CREATE FULLTEXT INDEX artist_name_fulltext IF NOT EXISTS FOR (a:Artist) ON EACH [a.name];",
+            
+            "CREATE FULLTEXT INDEX album_name_fulltext IF NOT EXISTS FOR (a:Album) ON EACH [a.name];",
+
+            "CREATE FULLTEXT INDEX track_title_fulltext IF NOT EXISTS FOR (t:Track) ON EACH [t.title];",
+
+            "CREATE FULLTEXT INDEX genre_fulltext IF NOT EXISTS FOR (g:Genre) ON EACH [g.name];",
+
+            "CREATE FULLTEXT INDEX location_fulltext IF NOT EXISTS FOR (n:Country|City|Region) ON EACH [n.name]",
+            
+            # Filtering (e.g., "Tracks from 2020")
+            "CREATE INDEX artist_founded_idx IF NOT EXISTS FOR (a:Artist) ON (a.founded_year)",
+            "CREATE INDEX track_year_idx IF NOT EXISTS FOR (t:Track) ON (t.year)",
+
+            # Sorting (e.g., "Most viewed tracks")
+            "CREATE INDEX track_views_idx IF NOT EXISTS FOR (t:Track) ON (t.views)",
+            "CREATE INDEX album_playcount_idx IF NOT EXISTS FOR (a:Album) ON (a.playcount)",
+
+            f"""
+            CREATE VECTOR INDEX embedding_d_vector IF NOT EXISTS
+            FOR (e:EmbeddingDescription) ON (e.vector)
+            OPTIONS {{indexConfig: {{
+            `vector.dimensions`: {self.embedding_description_dim},
+            `vector.similarity_function`: 'cosine'
+            }}}}
+            """,
+
+            f"""
+            CREATE VECTOR INDEX embedding_l_vector IF NOT EXISTS
+            FOR (e:EmbeddingLyrics) ON (e.vector)
+            OPTIONS {{indexConfig: {{
+            `vector.dimensions`: {self.embedding_lyric_dim},
+            `vector.similarity_function`: 'cosine'
+            }}}}
+            """
+        ]
+        with self.driver.session() as session:
+            for cmd in commands:
+                print(f"Executing: {cmd.strip().splitlines()[0]}...") # Print first line for brevity
+                try:
+                    session.run(cmd)
+                except Exception as e:
+                    print(f"Error executing command: {e}")
+            print("\nAll indexes and constraints checked/created.")
+
+
 
 if __name__ == "__main__":
-    TRACKS_TO_ADD = 100
+    TRACKS_TO_ADD = 15000
 
-    dataset_path = "../data_parsing/data/ds2_merged_10000.json"
+    # dataset_path = "../data_parsing/data/ds2_merged_10000.json"
+    dataset_path = "../data_parsing/data/balanced_15k_merged.json"
     genres_hieararchy_path = "../data/genres_sample.json"
     locations_hieararchy_path = "../data/locations_sample.json"
 
@@ -470,6 +550,7 @@ if __name__ == "__main__":
         genres_hierarchy = creator.read_json(genres_hieararchy_path)
         countries_hieararchy = creator.read_json(locations_hieararchy_path)
 
+        creator.create_indexes()
         creator.create_genres_tree(genres_hierarchy)
         creator.create_locations_tree(countries_hieararchy)
 
