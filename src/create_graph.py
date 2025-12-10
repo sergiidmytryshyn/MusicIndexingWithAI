@@ -1,32 +1,23 @@
+import os
+import re
+import time
 import json
 from neo4j import GraphDatabase
-import torch
-from transformers import AutoModel
 from typing import List, Optional
-from tqdm import tqdm
-import re
-import random
-import os
 from dotenv import load_dotenv
-load_dotenv()
 
+
+load_dotenv()
 
 
 class GraphCreator:
     def __init__(self, uri, auth):
-        uri = "bolt://localhost:7687"
-        auth = ("neo4j", "password")
         self.driver = GraphDatabase.driver(uri, auth=auth)
         self.driver.verify_connectivity()
         print("Connection established successfully!")
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_name = "jinaai/jina-embeddings-v3"
-        self.model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
-        self.model.to(device)
-        # self.model = None # DO NOT DELETE
-        self.embedding_lyric_dim = 128
-        self.embedding_description_dim = 256
+        self.embedding_lyric_dim = 1024
+        self.embedding_description_dim = 1024
 
     def close(self):
         self.driver.close()
@@ -171,43 +162,6 @@ class GraphCreator:
         
         GraphCreator._connect_to_earth(tx)
 
-    def get_embeddings(
-        self,
-        texts: List[str],
-        embedding_size: Optional[int] = None,
-        batch_size: int = 256,
-    ) -> List[List[float]]:
-        """
-        Generate embeddings for a list of strings using jinaai/jina-embeddings-v3.
-        
-        Args:
-            texts: List of strings to embed
-            embedding_size: Optional embedding size. If provided, uses matryoshka encoding
-                            (truncate_dim) to return embeddings of the specified size.
-            batch_size: Batch size for processing texts (default: 32)
-        
-        Returns:
-            List of embeddings, where each embedding is a list of floats
-        """
-        fake_embedding = [[random.uniform(0, 1) for _ in range(embedding_size)] for i in texts]
-        return fake_embedding
-
-        all_embeddings = []
-        
-        # Process texts in batches
-        for i in tqdm(range(0, len(texts), batch_size), desc="Embedding texts", total=len(texts) // batch_size):
-            batch_texts = texts[i:i + batch_size]
-            
-            # Use model's encode method with optional truncate_dim for matryoshka encoding
-            if embedding_size is not None:
-                batch_embeddings = self.model.encode(batch_texts, truncate_dim=embedding_size)
-            else:
-                batch_embeddings = self.model.encode(batch_texts)
-            
-            # Convert numpy arrays to list of lists of floats
-            all_embeddings.extend([emb.tolist() for emb in batch_embeddings])
-        
-        return all_embeddings
 
     def create_genres_tree(self, data):
         """Populates the genre database with the given data."""
@@ -232,22 +186,20 @@ class GraphCreator:
 
             artist_data = track_data.get('artist', {})
             artist_name = artist_data.get('name', track_data.get('artist_name', ''))
-            description_text = artist_data.get('description', '')
-            lyrics_text = track_data.get('lyrics', '')
             track_id = track_data.get('id')
 
-            # Added lyrics and description embedding insertion
-            # Description embeddings (256 dims) 
-            if description_text and artist_name:
-                desc_chunks = self.chunk_text(description_text, chunk_size=500, overlap_ratio=0.2)
-                desc_embeddings = self.get_embeddings(desc_chunks, embedding_size=self.embedding_description_dim)
+            # Use pre-computed embeddings from JSON data
+            description_chunks = track_data.get('description_chunks', [])
+            if description_chunks and artist_name:
                 desc_payload = [
                     {
-                        "id": f"desc_emb_{artist_name}_{idx}",
-                        "vector": emb,
-                        "number": idx
+                        "id": f"desc_emb_{artist_name}_{chunk['idx']}",
+                        "text": chunk['text'],
+                        "vector": chunk['embedding'],
+                        "number": chunk['idx']
                     }
-                    for idx, emb in enumerate(desc_embeddings)
+                    for chunk in description_chunks
+                    if 'idx' in chunk and 'embedding' in chunk
                 ]
                 if desc_payload:
                     session.execute_write(
@@ -257,17 +209,18 @@ class GraphCreator:
                         desc_payload
                     )
 
-            # Lyrics embeddings (128 dims)
-            if lyrics_text and track_id:
-                lyrics_chunks = self.chunk_text(lyrics_text, chunk_size=500, overlap_ratio=0.2)
-                lyrics_embeddings = self.get_embeddings(lyrics_chunks, embedding_size=self.embedding_lyric_dim)
+            # Lyrics embeddings from lyrics_chunks
+            lyrics_chunks = track_data.get('lyrics_chunks', [])
+            if lyrics_chunks and track_id:
                 lyrics_payload = [
                     {
-                        "id": f"lyrics_emb_{track_id}_{idx}",
-                        "vector": emb,
-                        "number": idx
+                        "id": f"lyrics_emb_{track_id}_{chunk['idx']}",
+                        "text": chunk['text'],
+                        "vector": chunk['embedding'],
+                        "number": chunk['idx']
                     }
-                    for idx, emb in enumerate(lyrics_embeddings)
+                    for chunk in lyrics_chunks
+                    if 'idx' in chunk and 'embedding' in chunk
                 ]
                 if lyrics_payload:
                     session.execute_write(
@@ -440,6 +393,7 @@ class GraphCreator:
         UNWIND $embeddings AS emb
         MERGE (e:{embedding_type} {{id: emb.id}})
         SET e.vector = emb.vector,
+            e.text = emb.text,
             e.number = emb.number
         WITH e
         MATCH (t:{target_label} {{id: $target_id}})
@@ -526,17 +480,23 @@ class GraphCreator:
 
 
 
+def print_time(msg):
+    print(f"{msg} in: {b-a:.2f}s")
 if __name__ == "__main__":
-    TRACKS_TO_ADD = 15000
-
+    # TRACKS_TO_ADD = 100
+    start = time.time()
     # dataset_path = "../data_parsing/data/ds2_merged_10000.json"
     dataset_path = "../data_parsing/data/balanced_15k_merged.json"
+    dataset_path = "test.json"
+
     genres_hieararchy_path = "../data/genres_sample.json"
     locations_hieararchy_path = "../data/locations_sample.json"
 
     uri = os.environ.get("NEO4J_URI")
     username = os.environ.get("NEO4J_USERNAME")
     password = os.environ.get("NEO4J_PASSWORD")
+    # uri = "bolt://localhost:7687"
+    # auth = ("neo4j", "password")
     
     if not all([uri, username, password]):
         raise ValueError("Neo4j connection environment variables not set.")
@@ -546,7 +506,13 @@ if __name__ == "__main__":
     creator = GraphCreator(uri, auth)
 
     try:
+        a = time.time()
         data = creator.read_json(dataset_path)["songs"]
+        TRACKS_TO_ADD = len(data)
+
+        b = time.time()
+        print_time("Loaded dataset")
+
         genres_hierarchy = creator.read_json(genres_hieararchy_path)
         countries_hieararchy = creator.read_json(locations_hieararchy_path)
 
@@ -555,10 +521,18 @@ if __name__ == "__main__":
         creator.create_locations_tree(countries_hieararchy)
 
         print("Starting import...")
-
-        for track in data[:TRACKS_TO_ADD]:
+        a = time.time()
+        batch = 100
+        for i, track in enumerate(data):
             creator.import_track(track)
-            print(f"Imported: {track['title']}")
+            if i % batch == 0 and i > 0:
+                b = time.time()
+                print_time(f"Imported {i}/{TRACKS_TO_ADD} tracks")
+                a = time.time()
+            # print(f"Imported: {track['title']}")
+        
     finally:
         creator.close()
-        print("Import finished.")
+        a = start
+        b = time.time()
+        print_time("Import finished.")
