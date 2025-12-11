@@ -1,0 +1,1245 @@
+{
+  "timestamp": "20251211_202001",
+  "total_prompts": 22,
+  "results": [
+    {
+      "prompt": "I'm trying to find this rock song from the 70s, I think it's British, and it has this epic guitar solo. The lyrics mention something about a stairway or heaven, and it's really long",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords>\n            <keyword>stairway</keyword>\n            <keyword>heaven</keyword>\n        </title_keywords>\n        <year_from>1970</year_from>\n        <year_to>1979</year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>stairway</keyword>\n            <keyword>heaven</keyword>\n        </lyrics_keywords>\n        <lyrics_text>lyrics about stairway or heaven</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <country>United Kingdom</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>epic</keyword>\n            <keyword>guitar</keyword>\n        </description_keywords>\n        <description_text>British rock band known for epic guitar solos</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [
+            "stairway",
+            "heaven"
+          ],
+          "year_from": 1970,
+          "year_to": 1979,
+          "genres": [
+            "rock"
+          ],
+          "lyrics_keywords": [
+            "stairway",
+            "heaven"
+          ],
+          "lyrics_text": "lyrics about stairway or heaven"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "rock"
+          ],
+          "country": "United Kingdom",
+          "region": null,
+          "description_keywords": [
+            "epic",
+            "guitar"
+          ],
+          "description_text": "British rock band known for epic guitar solos"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: 2 items",
+        "track.year_from: 1970",
+        "track.year_to: 1979",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: lyrics about stairway or heaven",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: United Kingdom",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 2 items",
+        "artist.description_text: British rock band known for epic guitar solos",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this French song from maybe the 40s or 50s, a woman singing, very romantic, I think the title has 'rose' in it and it's about seeing life through rose-colored glasses",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords>\n            <keyword>rose</keyword>\n        </title_keywords>\n        <year_from>1940</year_from>\n        <year_to>1950</year_to>\n        <genres>\n        </genres>\n        <lyrics_keywords>\n            <keyword>rose-colored glasses</keyword>\n            <keyword>life</keyword>\n        </lyrics_keywords>\n        <lyrics_text>seeing life through rose-colored glasses</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords>\n        </name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n        </genres>\n        <country>France</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>woman</keyword>\n            <keyword>romantic</keyword>\n        </description_keywords>\n        <description_text>woman singer from France performing romantic songs</description_text>\n    </artist>\n    <features>\n    </features>\n    <album>\n        <name_keywords>\n        </name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [
+            "rose"
+          ],
+          "year_from": 1940,
+          "year_to": 1950,
+          "genres": [],
+          "lyrics_keywords": [
+            "rose-colored glasses",
+            "life"
+          ],
+          "lyrics_text": "seeing life through rose-colored glasses"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": "France",
+          "region": null,
+          "description_keywords": [
+            "woman",
+            "romantic"
+          ],
+          "description_text": "woman singer from France performing romantic songs"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: 1 items",
+        "track.year_from: 1940",
+        "track.year_to: 1950",
+        "track.genres: empty list (present in XML)",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: seeing life through rose-colored glasses",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: France",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 2 items",
+        "artist.description_text: woman singer from France performing romantic songs",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Looking for a Norwegian metal band, they started in the 90s, very dark sound, I think they sing about forests or nature, something atmospheric and heavy",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>metal</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>forests</keyword>\n            <keyword>nature</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about forests and nature</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>1990</founded_year_from>\n        <founded_year_to>1999</founded_year_to>\n        <genres>\n            <genre>metal</genre>\n        </genres>\n        <country>Norway</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>dark</keyword>\n            <keyword>atmospheric</keyword>\n            <keyword>heavy</keyword>\n        </description_keywords>\n        <description_text>dark atmospheric heavy metal band from Norway</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "metal"
+          ],
+          "lyrics_keywords": [
+            "forests",
+            "nature"
+          ],
+          "lyrics_text": "songs about forests and nature"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": 1990,
+          "founded_year_to": 1999,
+          "genres": [
+            "metal"
+          ],
+          "country": "Norway",
+          "region": null,
+          "description_keywords": [
+            "dark",
+            "atmospheric",
+            "heavy"
+          ],
+          "description_text": "dark atmospheric heavy metal band from Norway"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: songs about forests and nature",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: 1990",
+        "artist.founded_year_to: 1999",
+        "artist.genres: 1 items",
+        "artist.country: Norway",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 3 items",
+        "artist.description_text: dark atmospheric heavy metal band from Norway",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I remember a song where the chorus goes something like 'I remember when, I remember when I lost my mind' - it's a pop or electronic song, maybe from the 2000s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2000</year_from>\n        <year_to>2009</year_to>\n        <genres>\n            <genre>pop</genre>\n            <genre>electronic</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>remember</keyword>\n            <keyword>lost my mind</keyword>\n        </lyrics_keywords>\n        <lyrics_text>I remember when I lost my mind</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2000,
+          "year_to": 2009,
+          "genres": [
+            "pop",
+            "electronic"
+          ],
+          "lyrics_keywords": [
+            "remember",
+            "lost my mind"
+          ],
+          "lyrics_text": "I remember when I lost my mind"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2000",
+        "track.year_to: 2009",
+        "track.genres: 2 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: I remember when I lost my mind",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this song that talks about a man who had a farm, and it mentions animals like a cow and a pig, I think it's a children's song or maybe country",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>children's</genre>\n            <genre>country</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>farm</keyword>\n            <keyword>cow</keyword>\n            <keyword>pig</keyword>\n        </lyrics_keywords>\n        <lyrics_text>a man who had a farm with animals like a cow and a pig</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "children's",
+            "country"
+          ],
+          "lyrics_keywords": [
+            "farm",
+            "cow",
+            "pig"
+          ],
+          "lyrics_text": "a man who had a farm with animals like a cow and a pig"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 2 items",
+        "track.lyrics_keywords: 3 items",
+        "track.lyrics_text: a man who had a farm with animals like a cow and a pig",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I'm looking for a song that says 'we are the champions of the world' - it's a rock anthem, very powerful, probably from the 70s or 80s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>1970</year_from>\n        <year_to>1989</year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>champions</keyword>\n            <keyword>world</keyword>\n        </lyrics_keywords>\n        <lyrics_text>we are the champions of the world</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 1970,
+          "year_to": 1989,
+          "genres": [
+            "rock"
+          ],
+          "lyrics_keywords": [
+            "champions",
+            "world"
+          ],
+          "lyrics_text": "we are the champions of the world"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 1970",
+        "track.year_to: 1989",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: we are the champions of the world",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this hip hop track where the rapper talks about growing up in the streets, mentions his neighborhood, something about making it out, probably from the US",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>streets</keyword>\n            <keyword>neighborhood</keyword>\n            <keyword>making it out</keyword>\n        </lyrics_keywords>\n        <lyrics_text>growing up in the streets, neighborhood life, making it out</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <country>United States</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "hip hop"
+          ],
+          "lyrics_keywords": [
+            "streets",
+            "neighborhood",
+            "making it out"
+          ],
+          "lyrics_text": "growing up in the streets, neighborhood life, making it out"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "hip hop"
+          ],
+          "country": "United States",
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 3 items",
+        "track.lyrics_text: growing up in the streets, neighborhood life, making it out",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: United States",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I need to find a song where the lyrics mention 'tears falling down' or something about crying, it's a sad ballad, maybe pop or R&B",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>pop</genre>\n            <genre>r&amp;b</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>tears</keyword>\n            <keyword>crying</keyword>\n        </lyrics_keywords>\n        <lyrics_text>tears falling down and crying, sad emotional content</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "pop",
+            "r&b"
+          ],
+          "lyrics_keywords": [
+            "tears",
+            "crying"
+          ],
+          "lyrics_text": "tears falling down and crying, sad emotional content"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 2 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: tears falling down and crying, sad emotional content",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Looking for a song that has 'highway to hell' in the lyrics, it's a classic rock song, very energetic",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>classic rock</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>highway to hell</keyword>\n        </lyrics_keywords>\n        <lyrics_text>highway to hell</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "classic rock"
+          ],
+          "lyrics_keywords": [
+            "highway to hell"
+          ],
+          "lyrics_text": "highway to hell"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 1 items",
+        "track.lyrics_text: highway to hell",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I'm trying to find songs about heartbreak, specifically about a relationship ending, maybe something about being left behind or moving on",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres></genres>\n        <lyrics_keywords>\n            <keyword>heartbreak</keyword>\n            <keyword>relationship ending</keyword>\n            <keyword>left behind</keyword>\n            <keyword>moving on</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about heartbreak, relationship ending, being left behind, and moving on</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [],
+          "lyrics_keywords": [
+            "heartbreak",
+            "relationship ending",
+            "left behind",
+            "moving on"
+          ],
+          "lyrics_text": "songs about heartbreak, relationship ending, being left behind, and moving on"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: empty list (present in XML)",
+        "track.lyrics_keywords: 4 items",
+        "track.lyrics_text: songs about heartbreak, relationship ending, being left behind, and moving on",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this song about love and relationships, talks about being together forever, I think it's a pop ballad from the 80s or 90s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>1980</year_from>\n        <year_to>1999</year_to>\n        <genres>\n            <genre>pop</genre>\n            <genre>ballad</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>love</keyword>\n            <keyword>relationships</keyword>\n            <keyword>together</keyword>\n            <keyword>forever</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about love and relationships, being together forever</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 1980,
+          "year_to": 1999,
+          "genres": [
+            "pop",
+            "ballad"
+          ],
+          "lyrics_keywords": [
+            "love",
+            "relationships",
+            "together",
+            "forever"
+          ],
+          "lyrics_text": "songs about love and relationships, being together forever"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 1980",
+        "track.year_to: 1999",
+        "track.genres: 2 items",
+        "track.lyrics_keywords: 4 items",
+        "track.lyrics_text: songs about love and relationships, being together forever",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Looking for a song about memories, something nostalgic, talks about the good old days or remembering better times",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres></genres>\n        <lyrics_keywords>\n            <keyword>memories</keyword>\n            <keyword>good old days</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about memories and remembering better times, nostalgic themes</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [],
+          "lyrics_keywords": [
+            "memories",
+            "good old days"
+          ],
+          "lyrics_text": "songs about memories and remembering better times, nostalgic themes"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: empty list (present in XML)",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: songs about memories and remembering better times, nostalgic themes",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I want something really danceable and viral, maybe K-pop from South Korea, released in the last few years, something that went viral on TikTok",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2021</year_from>\n        <year_to>2024</year_to>\n        <genres>\n            <genre>k-pop</genre>\n        </genres>\n        <lyrics_keywords></lyrics_keywords>\n        <lyrics_text>null</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>k-pop</genre>\n        </genres>\n        <country>South Korea</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>viral</keyword>\n            <keyword>danceable</keyword>\n        </description_keywords>\n        <description_text>k-pop artists from South Korea known for viral danceable tracks</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2021,
+          "year_to": 2024,
+          "genres": [
+            "k-pop"
+          ],
+          "lyrics_keywords": [],
+          "lyrics_text": null
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "k-pop"
+          ],
+          "country": "South Korea",
+          "region": null,
+          "description_keywords": [
+            "viral",
+            "danceable"
+          ],
+          "description_text": "k-pop artists from South Korea known for viral danceable tracks"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2021",
+        "track.year_to: 2024",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: empty list (present in XML)",
+        "track.lyrics_text: null/empty (present in XML)",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: South Korea",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 2 items",
+        "artist.description_text: k-pop artists from South Korea known for viral danceable tracks",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Looking for upbeat and catchy pop songs from Oceania, maybe Australia or New Zealand, something with tropical vibes, released in the 2010s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2010</year_from>\n        <year_to>2019</year_to>\n        <genres>\n            <genre>pop</genre>\n        </genres>\n        <lyrics_keywords></lyrics_keywords>\n        <lyrics_text>null</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>pop</genre>\n        </genres>\n        <country>null</country>\n        <region>Oceania</region>\n        <description_keywords>\n            <keyword>upbeat</keyword>\n            <keyword>catchy</keyword>\n            <keyword>tropical</keyword>\n        </description_keywords>\n        <description_text>upbeat and catchy pop artists from Oceania with tropical vibes</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2010,
+          "year_to": 2019,
+          "genres": [
+            "pop"
+          ],
+          "lyrics_keywords": [],
+          "lyrics_text": null
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "pop"
+          ],
+          "country": null,
+          "region": "Oceania",
+          "description_keywords": [
+            "upbeat",
+            "catchy",
+            "tropical"
+          ],
+          "description_text": "upbeat and catchy pop artists from Oceania with tropical vibes"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2010",
+        "track.year_to: 2019",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: empty list (present in XML)",
+        "track.lyrics_text: null/empty (present in XML)",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: Oceania",
+        "artist.description_keywords: 3 items",
+        "artist.description_text: upbeat and catchy pop artists from Oceania with tropical vibes",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I need motivational hip hop tracks, something powerful and inspiring, featuring artists like Eminem or Rihanna, from the United States",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>motivational</keyword>\n            <keyword>powerful</keyword>\n            <keyword>inspiring</keyword>\n        </lyrics_keywords>\n        <lyrics_text>motivational and inspiring hip hop tracks</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <country>United States</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>hip hop artists from United States</description_text>\n    </artist>\n    <features>\n        <feature>Eminem</feature>\n        <feature>Rihanna</feature>\n    </features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "hip hop"
+          ],
+          "lyrics_keywords": [
+            "motivational",
+            "powerful",
+            "inspiring"
+          ],
+          "lyrics_text": "motivational and inspiring hip hop tracks"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "hip hop"
+          ],
+          "country": "United States",
+          "region": null,
+          "description_keywords": [],
+          "description_text": "hip hop artists from United States"
+        },
+        "features": [
+          "Eminem",
+          "Rihanna"
+        ],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 3 items",
+        "track.lyrics_text: motivational and inspiring hip hop tracks",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: United States",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: hip hop artists from United States",
+        "features: 2 items",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Find me epic and powerful rock songs from British bands in the 1970s, something with big guitar riffs and dramatic vocals",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>1970</year_from>\n        <year_to>1979</year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <lyrics_keywords></lyrics_keywords>\n        <lyrics_text>null</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <country>United Kingdom</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>epic</keyword>\n            <keyword>powerful</keyword>\n            <keyword>big guitar riffs</keyword>\n            <keyword>dramatic vocals</keyword>\n        </description_keywords>\n        <description_text>epic and powerful rock bands from United Kingdom with big guitar riffs and dramatic vocals</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 1970,
+          "year_to": 1979,
+          "genres": [
+            "rock"
+          ],
+          "lyrics_keywords": [],
+          "lyrics_text": null
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "rock"
+          ],
+          "country": "United Kingdom",
+          "region": null,
+          "description_keywords": [
+            "epic",
+            "powerful",
+            "big guitar riffs",
+            "dramatic vocals"
+          ],
+          "description_text": "epic and powerful rock bands from United Kingdom with big guitar riffs and dramatic vocals"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 1970",
+        "track.year_to: 1979",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: empty list (present in XML)",
+        "track.lyrics_text: null/empty (present in XML)",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: United Kingdom",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 4 items",
+        "artist.description_text: epic and powerful rock bands from United Kingdom with big guitar riffs and dramatic vocals",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this sad song with 'rain' in the lyrics, talks about standing in the rain, it's slow and emotional, probably a ballad",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>null</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>ballad</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>rain</keyword>\n        </lyrics_keywords>\n        <lyrics_text>standing in the rain, sad and emotional</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": null,
+          "year_to": null,
+          "genres": [
+            "ballad"
+          ],
+          "lyrics_keywords": [
+            "rain"
+          ],
+          "lyrics_text": "standing in the rain, sad and emotional"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: null/empty (present in XML)",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 1 items",
+        "track.lyrics_text: standing in the rain, sad and emotional",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I'm looking for upbeat pop songs about dancing, the lyrics mention dancing or partying, something catchy and fun, maybe from the 2010s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2010</year_from>\n        <year_to>2019</year_to>\n        <genres>\n            <genre>pop</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>dancing</keyword>\n            <keyword>partying</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about dancing and partying</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2010,
+          "year_to": 2019,
+          "genres": [
+            "pop"
+          ],
+          "lyrics_keywords": [
+            "dancing",
+            "partying"
+          ],
+          "lyrics_text": "songs about dancing and partying"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2010",
+        "track.year_to: 2019",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: songs about dancing and partying",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Find me a song that says something about 'losing yourself' or 'finding yourself', it's motivational hip hop, probably from the 2000s",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2000</year_from>\n        <year_to>2009</year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>losing yourself</keyword>\n            <keyword>finding yourself</keyword>\n        </lyrics_keywords>\n        <lyrics_text>losing yourself or finding yourself</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords>\n            <keyword>motivational</keyword>\n        </description_keywords>\n        <description_text>motivational hip hop artist</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2000,
+          "year_to": 2009,
+          "genres": [
+            "hip hop"
+          ],
+          "lyrics_keywords": [
+            "losing yourself",
+            "finding yourself"
+          ],
+          "lyrics_text": "losing yourself or finding yourself"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [
+            "motivational"
+          ],
+          "description_text": "motivational hip hop artist"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2000",
+        "track.year_to: 2009",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: losing yourself or finding yourself",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: 1 items",
+        "artist.description_text: motivational hip hop artist",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "I remember a song by The Beatles, from their early period around 1960-1965, I think it's from an album with 'love' in the title, and the song itself might have 'love' in the lyrics too",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>1960</year_from>\n        <year_to>1965</year_to>\n        <genres></genres>\n        <lyrics_keywords>\n            <keyword>love</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs with love in the lyrics</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords>\n            <keyword>beatles</keyword>\n        </name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>null</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords>\n            <keyword>love</keyword>\n        </name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 1960,
+          "year_to": 1965,
+          "genres": [],
+          "lyrics_keywords": [
+            "love"
+          ],
+          "lyrics_text": "songs with love in the lyrics"
+        },
+        "artist": {
+          "name_keywords": [
+            "beatles"
+          ],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": null,
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [],
+        "album": {
+          "name_keywords": [
+            "love"
+          ]
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 1960",
+        "track.year_to: 1965",
+        "track.genres: empty list (present in XML)",
+        "track.lyrics_keywords: 1 items",
+        "track.lyrics_text: songs with love in the lyrics",
+        "artist.name_keywords: 1 items",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: null/empty (present in XML)",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: empty list (present in XML)",
+        "album.name_keywords: 1 items"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "Looking for hip hop tracks from North America, featuring Drake, released after 2010, and the lyrics might mention something about success or money",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords></title_keywords>\n        <year_from>2010</year_from>\n        <year_to>null</year_to>\n        <genres>\n            <genre>hip hop</genre>\n        </genres>\n        <lyrics_keywords>\n            <keyword>success</keyword>\n            <keyword>money</keyword>\n        </lyrics_keywords>\n        <lyrics_text>songs about success and money</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres></genres>\n        <country>null</country>\n        <region>North America</region>\n        <description_keywords></description_keywords>\n        <description_text>null</description_text>\n    </artist>\n    <features>\n        <feature>Drake</feature>\n    </features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [],
+          "year_from": 2010,
+          "year_to": null,
+          "genres": [
+            "hip hop"
+          ],
+          "lyrics_keywords": [
+            "success",
+            "money"
+          ],
+          "lyrics_text": "songs about success and money"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [],
+          "country": null,
+          "region": "North America",
+          "description_keywords": [],
+          "description_text": null
+        },
+        "features": [
+          "Drake"
+        ],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: empty list (present in XML)",
+        "track.year_from: 2010",
+        "track.year_to: null/empty (present in XML)",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: 2 items",
+        "track.lyrics_text: songs about success and money",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: empty list (present in XML)",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: North America",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: null/empty (present in XML)",
+        "features: 1 items",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    },
+    {
+      "prompt": "There's this song with 'hotel' in the title, it's rock, from North America, released in the 1970s, and I think the lyrics tell some kind of story about a hotel",
+      "raw_xml": "<extraction>\n    <track>\n        <title_keywords>\n            <keyword>hotel</keyword>\n        </title_keywords>\n        <year_from>1970</year_from>\n        <year_to>1979</year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <lyrics_keywords></lyrics_keywords>\n        <lyrics_text>story about a hotel</lyrics_text>\n    </track>\n    <artist>\n        <name_keywords></name_keywords>\n        <founded_year_from>null</founded_year_from>\n        <founded_year_to>null</founded_year_to>\n        <genres>\n            <genre>rock</genre>\n        </genres>\n        <country>null</country>\n        <region>North America</region>\n        <description_keywords></description_keywords>\n        <description_text>rock band from North America</description_text>\n    </artist>\n    <features></features>\n    <album>\n        <name_keywords></name_keywords>\n    </album>\n</extraction>",
+      "extracted_json": {
+        "track": {
+          "title_keywords": [
+            "hotel"
+          ],
+          "year_from": 1970,
+          "year_to": 1979,
+          "genres": [
+            "rock"
+          ],
+          "lyrics_keywords": [],
+          "lyrics_text": "story about a hotel"
+        },
+        "artist": {
+          "name_keywords": [],
+          "founded_year_from": null,
+          "founded_year_to": null,
+          "genres": [
+            "rock"
+          ],
+          "country": null,
+          "region": "North America",
+          "description_keywords": [],
+          "description_text": "rock band from North America"
+        },
+        "features": [],
+        "album": {
+          "name_keywords": []
+        }
+      },
+      "parsed_fields": [
+        "track.title_keywords: 1 items",
+        "track.year_from: 1970",
+        "track.year_to: 1979",
+        "track.genres: 1 items",
+        "track.lyrics_keywords: empty list (present in XML)",
+        "track.lyrics_text: story about a hotel",
+        "artist.name_keywords: empty list (present in XML)",
+        "artist.founded_year_from: null/empty (present in XML)",
+        "artist.founded_year_to: null/empty (present in XML)",
+        "artist.genres: 1 items",
+        "artist.country: null/empty (present in XML)",
+        "artist.region: North America",
+        "artist.description_keywords: empty list (present in XML)",
+        "artist.description_text: rock band from North America",
+        "features: empty list (present in XML)",
+        "album.name_keywords: empty list (present in XML)"
+      ],
+      "missing_fields": [],
+      "parsing_errors": [],
+      "has_errors": false
+    }
+  ],
+  "summary": {
+    "total_tests": 22,
+    "successful": 22,
+    "with_errors": 0,
+    "total_parsing_errors": 0,
+    "total_missing_fields": 0
+  }
+}
