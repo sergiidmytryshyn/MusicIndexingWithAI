@@ -41,3 +41,5 @@ anthropic
 tqdm
 torch
 transformers
+dotenv
+langchain-text-splitters

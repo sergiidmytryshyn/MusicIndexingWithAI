@@ -1,0 +1,88 @@
+{
+  "Parts_of_the_World": [
+    {
+      "name": "Europe",
+      "countries": [
+        {
+          "name": "France",
+          "cities": []
+        },
+        {
+          "name": "United Kingdom",
+          "cities": []
+        },
+        {
+          "name": "Germany",
+          "cities": []
+        },
+        {
+          "name": "Ireland",
+          "cities": []
+        },
+        {
+          "name": "Austria",
+          "cities": []
+        },
+        {
+          "name": "Norway",
+          "cities": []
+        },
+        {
+          "name": "Sweden",
+          "cities": []
+        },
+        {
+          "name": "Ukraine",
+          "cities": []
+        },
+        {
+          "name": "Belgium",
+          "cities": []
+        }
+      ]
+    },
+    {
+      "name": "North America",
+      "countries": [
+        {
+          "name": "United States",
+          "cities": []
+        },
+        {
+          "name": "Canada",
+          "cities": []
+        }
+      ]
+    },
+    {
+      "name": "South America",
+      "countries": [
+        {
+          "name": "Brasil",
+          "cities": []
+        },
+        {
+          "name": "Argentina",
+          "cities": []
+        }
+      ]
+    },
+    {
+      "name": "Asia",
+      "countries": []
+    },
+    {
+      "name": "Oceania",
+      "countries": [
+        {
+          "name": "Australia",
+          "cities": []
+        }
+      ]
+    },
+    {
+      "name": "unknown",
+      "countries": []
+    }
+  ]
+}

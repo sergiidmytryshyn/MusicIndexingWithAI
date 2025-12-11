@@ -56,3 +56,28 @@ class MergedSongInfo(BaseModel):
 
 class MergedSongDataset(BaseModel):
     songs: List[MergedSongInfo]
+
+# Chunk model for lyrics and description chunks
+class Chunk(BaseModel):
+    idx: int
+    text: str
+    embedding: List[float]
+
+# Final Song model with chunks
+class SongFinal(BaseModel):
+    title: str
+    tag: str
+    artist_name: str  # Keep original artist name string
+    year: Optional[int]
+    views: Optional[int]
+    features: Optional[str]
+    lyrics: Optional[str]
+    id: Optional[int]
+    # Enriched fields
+    artist: Optional[ArtistInfo]  # Full artist info with albums
+    album: Optional[AlbumInfo]  # Album info if matched
+    lyrics_chunks: List[Chunk]
+    description_chunks: List[Chunk]
+
+class SongFinalDataset(BaseModel):
+    songs: List[SongFinal]

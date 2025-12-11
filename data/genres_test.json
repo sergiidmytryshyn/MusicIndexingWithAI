@@ -1,0 +1,292 @@
+{
+  "music": [
+    {
+      "supreme_genre": "Hip Hop & Rap",
+      "subgenres": [
+        {
+          "name": "rap",
+          "subgenres": [
+            { "name": "gangsta rap", "subgenres": [] },
+            { "name": "east coast rap", "subgenres": [] },
+            { "name": "cloud rap", "subgenres": [] },
+            { "name": "alternative rap", "subgenres": [] },
+            { "name": "drill", "subgenres": [] },
+            { "name": "trap", "subgenres": [] },
+            { "name": "dirty south", "subgenres": [] },
+            { "name": "country rap", "subgenres": [] },
+            { "name": "emo rap", "subgenres": [] },
+            { "name": "pop rap", "subgenres": [] },
+            { "name": "rap francais", "subgenres": [] },
+            { "name": "southern rap", "subgenres": [] },
+            { "name": "trap rap", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "hip hop",
+          "subgenres": [
+            { "name": "underground hip-hop", "subgenres": [] },
+            { "name": "underground hip hop", "subgenres": [] },
+            { "name": "hardcore hip hop", "subgenres": [] },
+            { "name": "jazz hop", "subgenres": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Rock",
+      "subgenres": [
+        {
+          "name": "rock",
+          "subgenres": [
+            { "name": "alternative rock", "subgenres": [] },
+            { "name": "garage rock", "subgenres": [] },
+            { "name": "psychedelic rock", "subgenres": [] },
+            { "name": "classic rock", "subgenres": [] },
+            { "name": "hard rock", "subgenres": [] },
+            { "name": "indie rock", "subgenres": [] },
+            {
+              "name": "noise rock",
+              "subgenres": []
+            },
+            {
+              "name": "shoegaze",
+              "subgenres": [
+                { "name": "blackgaze", "subgenres": [] }
+              ]
+            },
+            { "name": "dream pop", "subgenres": [] },
+            { "name": "grunge", "subgenres": [] },
+            { "name": "math rock", "subgenres": [] },
+            { "name": "gothic", "subgenres": [] },
+            { "name": "depressive rock", "subgenres": [] },
+            { "name": "folk rock", "subgenres": [] },
+            { "name": "glam rock", "subgenres": [] },
+            { "name": "indie", "subgenres": [] },
+            { "name": "new wave", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "punk",
+          "subgenres": [
+            { "name": "punk rock", "subgenres": [] },
+            { "name": "post-punk", "subgenres": [] },
+            { "name": "proto-punk", "subgenres": [] },
+            { "name": "pop punk", "subgenres": [] },
+            { "name": "post-hardcore", "subgenres": [] },
+            { "name": "emo", "subgenres": [] },
+            { "name": "screamo", "subgenres": [] },
+            { "name": "hardcore punk", "subgenres": [] },
+            {
+              "name": "hardcore",
+              "subgenres": [
+                { "name": "melodic hardcore", "subgenres": [] },
+                { "name": "straight edge", "subgenres": [] }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "post-rock",
+          "subgenres": []
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Pop",
+      "subgenres": [
+        {
+          "name": "pop",
+          "subgenres": [
+            { "name": "indie pop", "subgenres": [] },
+            { "name": "electropop", "subgenres": [] },
+            { "name": "synthpop", "subgenres": [] },
+            { "name": "synth pop", "subgenres": [] },
+            { "name": "art pop", "subgenres": [] },
+            { "name": "pop rock", "subgenres": [] },
+            { "name": "pop punk", "subgenres": [] },
+            { "name": "disco", "subgenres": [] },
+            { "name": "singer-songwriter", "subgenres": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "supreme_genre": "R&B & Soul",
+      "subgenres": [
+        {
+          "name": "rnb",
+          "subgenres": [
+            { "name": "r&b", "subgenres": [] },
+            { "name": "rhythm and blues", "subgenres": [] },
+            { "name": "alternative rnb", "subgenres": [] },
+            { "name": "prog-rnb", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "soul",
+          "subgenres": [
+            { "name": "neo-soul", "subgenres": [] },
+            { "name": "motown", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "funk",
+          "subgenres": []
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Electronic & Dance",
+      "subgenres": [
+        {
+          "name": "electronic",
+          "subgenres": [
+            { "name": "electronica", "subgenres": [] },
+            { "name": "idm", "subgenres": [] },
+            {
+              "name": "ambient",
+              "subgenres": [
+                { "name": "dark ambient", "subgenres": [] }
+              ]
+            },
+            { "name": "lo-fi", "subgenres": [] },
+            { "name": "psytrance", "subgenres": [] },
+            { "name": "trip-hop", "subgenres": [] },
+            { "name": "lounge", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "dance",
+          "subgenres": [
+            { "name": "house", "subgenres": [] },
+            { "name": "electro house", "subgenres": [] },
+            { "name": "techno", "subgenres": [] },
+            { "name": "detroit techno", "subgenres": [] },
+            { "name": "minimal", "subgenres": [] },
+            { "name": "dubstep", "subgenres": [] },
+            { "name": "electro", "subgenres": [] },
+            { "name": "big beat", "subgenres": [] },
+            { "name": "chillout", "subgenres": [] },
+            { "name": "dancehall", "subgenres": [] },
+            { "name": "uk garage", "subgenres": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Metal",
+      "subgenres": [
+        {
+          "name": "heavy metal",
+          "subgenres": [
+            { "name": "thrash metal", "subgenres": [] },
+            { "name": "speed metal", "subgenres": [] },
+            { "name": "nu metal", "subgenres": [] },
+            { "name": "progressive metal", "subgenres": [] },
+            {
+              "name": "folk metal",
+              "subgenres": [
+                { "name": "pagan metal", "subgenres": [] }
+              ]
+            },
+            { "name": "sludge", "subgenres": [] },
+            { "name": "stoner rock", "subgenres": [] },
+            {
+              "name": "grindcore",
+              "subgenres": [
+                { "name": "deathgrind", "subgenres": [] },
+                { "name": "goregrind", "subgenres": [] }
+              ]
+            },
+            { "name": "nwobhm", "subgenres": [] },
+            { "name": "avant-garde metal", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "death metal",
+          "subgenres": [
+            { "name": "melodic death metal", "subgenres": [] },
+            { "name": "technical death metal", "subgenres": [] },
+            { "name": "old school death metal", "subgenres": [] },
+            { "name": "progressive death metal", "subgenres": [] },
+            { "name": "brutal death metal", "subgenres": [] },
+            { "name": "blackened death metal", "subgenres": [] },
+            { "name": "deathgrind", "subgenres": [] },
+            { "name": "goregrind", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "black metal",
+          "subgenres": [
+            { "name": "ambient black metal", "subgenres": [] },
+            { "name": "atmospheric black metal", "subgenres": [] },
+            { "name": "depressive black metal", "subgenres": [] },
+            { "name": "symphonic black metal", "subgenres": [] },
+            { "name": "industrial black metal", "subgenres": [] },
+            { "name": "melodic black metal", "subgenres": [] },
+            { "name": "post-black metal", "subgenres": [] },
+            { "name": "pagan black metal", "subgenres": [] },
+            { "name": "true black metal", "subgenres": [] },
+            { "name": "viking metal", "subgenres": [] },
+            { "name": "blackened death metal", "subgenres": [] },
+            { "name": "blackgaze", "subgenres": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Latin",
+      "subgenres": [
+        { "name": "reggaeton", "subgenres": [] }
+      ]
+    },
+    {
+      "supreme_genre": "Jazz & Blues",
+      "subgenres": [
+        {
+          "name": "jazz",
+          "subgenres": [
+            { "name": "avant-garde jazz", "subgenres": [] },
+            { "name": "free jazz", "subgenres": [] },
+            { "name": "swing", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "blues",
+          "subgenres": []
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Country & Folk",
+      "subgenres": [
+        {
+          "name": "country",
+          "subgenres": [
+            { "name": "gothic country", "subgenres": [] },
+            { "name": "reggae", "subgenres": [] }
+          ]
+        },
+        {
+          "name": "folk",
+          "subgenres": [
+            { "name": "dark folk", "subgenres": [] },
+            { "name": "folk rock", "subgenres": [] }
+          ]
+        }
+      ]
+    },
+    {
+      "supreme_genre": "Other / Misc",
+      "subgenres": [
+        { "name": "experimental", "subgenres": [] },
+        { "name": "noise", "subgenres": [] },
+        { "name": "industrial", "subgenres": [] },
+        { "name": "comedy", "subgenres": [] },
+        { "name": "holiday", "subgenres": [] },
+        { "name": "christian", "subgenres": [] },
+        { "name": "musical", "subgenres": [] }
+      ]
+    }
+  ]
+}
