@@ -23,7 +23,7 @@ class ArtistInfo(BaseModel):
     tags: List[str]
     founded_year: Optional[str]
     founded_place: Optional[str]
-    albums: List[AlbumInfo]  # Albums are now part of ArtistInfo
+    albums: List[AlbumInfo]  
 
 # Genius
 class GeniusSongInfo(BaseModel):
@@ -67,15 +67,14 @@ class Chunk(BaseModel):
 class SongFinal(BaseModel):
     title: str
     tag: str
-    artist_name: str  # Keep original artist name string
+    artist_name: str  
     year: Optional[int]
     views: Optional[int]
     features: Optional[str]
     lyrics: Optional[str]
     id: Optional[int]
-    # Enriched fields
-    artist: Optional[ArtistInfo]  # Full artist info with albums
-    album: Optional[AlbumInfo]  # Album info if matched
+    artist: Optional[ArtistInfo]  
+    album: Optional[AlbumInfo]  
     lyrics_chunks: List[Chunk]
     description_chunks: List[Chunk]
 

@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[6]:
+
+
 import os
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
@@ -5,7 +11,7 @@ from collections import defaultdict
 import torch
 from transformers import AutoModel
 import numpy as np
-import json
+
 load_dotenv()
 
 if torch.backends.mps.is_available():
@@ -28,7 +34,7 @@ password = os.environ.get("NEO4J_PASSWORD")
 driver = GraphDatabase.driver(uri, auth=(username, password))
 
 
-# In[ ]:
+# In[21]:
 
 
 def embed_text(text):
@@ -46,11 +52,10 @@ def run_query(driver, cypher, params):
         return s.run(cypher, params).data()
 
 
-def list_to_or_query(items, HARD_MATCH):
+def list_to_or_query(items):
     if not items:
         return None
     clean = [str(x).strip() for x in items if str(x).strip()]
-    joiner = " OR " if HARD_MATCH else "~ OR "
     return " OR ".join(clean) if clean else None
 
 
@@ -100,7 +105,7 @@ def lyrics_ft_filter(driver, params):
 
 def lyrics_vec_filter(driver, params):
     q = """
-    CALL db.index.vector.queryNodes("embedding_l_vector", 200, $lyrics_vector)
+    CALL db.index.vector.queryNodes("embedding_l_vector", 50, $lyrics_vector)
     YIELD node, score
     MATCH (lyr:Lyrics)-[:HAS_EMBEDDING]->(node)
     MATCH (t:Track)-[:HAS_LYRICS]->(lyr)
@@ -119,7 +124,7 @@ def artist_name_filter(driver, params):
 
 def artist_description_vec_filter(driver, params):
     q = """
-    CALL db.index.vector.queryNodes("embedding_d_vector", 200, $description_vector)
+    CALL db.index.vector.queryNodes("embedding_d_vector", 50, $description_vector)
     YIELD node, score
     MATCH (desc:Description)-[:HAS_EMBEDDING]->(node)
     MATCH (a:Artist)-[:HAS_DESCRIPTION]->(desc)
@@ -170,24 +175,10 @@ def location_filter(driver, params):
 
 
 def artist_genre_filter(driver, params):
-    # q = """
-    # UNWIND $artist_genre_keywords AS kw
-    # CALL {
-    #     WITH kw
-    #     CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
-    #     RETURN node ORDER BY score DESC LIMIT 1
-    # }
-    # WITH collect(distinct node) AS top_nodes
-    # UNWIND top_nodes AS node
-    # MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
-    # WITH collect(distinct sub) AS allowed
-    # MATCH (t:Track)-[:PERFORMED_BY]->(a:Artist)-[:PERFORMS_GENRE]->(g:Genre)
-    # WHERE g IN allowed
-    # RETURN elementId(t) AS id
-    # """
     q = """
     UNWIND $artist_genre_keywords AS kw
-    CALL (kw) {
+    CALL {
+        WITH kw
         CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
         RETURN node ORDER BY score DESC LIMIT 1
     }
@@ -199,30 +190,14 @@ def artist_genre_filter(driver, params):
     WHERE g IN allowed
     RETURN elementId(t) AS id
     """
-
-
     return run_query(driver, q, params)
 
 
 def track_genre_filter(driver, params):
-    # q = """
-    # UNWIND $track_genre_keywords AS kw
-    # CALL {
-    #     WITH kw
-    #     CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
-    #     RETURN node ORDER BY score DESC LIMIT 1
-    # }
-    # WITH collect(distinct node) AS top_nodes
-    # UNWIND top_nodes AS node
-    # MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
-    # WITH collect(distinct sub) AS allowed
-    # MATCH (t:Track)-[:HAS_GENRE]->(g:Genre)
-    # WHERE g IN allowed
-    # RETURN elementId(t) AS id
-    # """
     q = """
     UNWIND $track_genre_keywords AS kw
-    CALL (kw) {
+    CALL {
+        WITH kw
         CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
         RETURN node ORDER BY score DESC LIMIT 1
     }
@@ -243,7 +218,7 @@ def features_filter(driver, params):
     CALL {
         WITH kw
         CALL db.index.fulltext.queryNodes("artist_name_fulltext", kw) YIELD node, score
-        RETURN node ORDER BY score DESC LIMIT 10
+        RETURN node ORDER BY score DESC LIMIT 1
     }
     WITH collect(distinct node) AS allowed_feature_artists
     MATCH (t:Track)-[:FEATURING]->(feat:Artist)
@@ -293,7 +268,7 @@ def album_filter(driver, params):
     AND ($album_views_to IS NULL OR alb.playcount <= $album_views_to)
 
     ORDER BY score DESC, alb.playcount DESC
-    LIMIT 50
+    LIMIT 30
 
     MATCH (t:Track)-[:APPEARS_ON]->(alb)
     RETURN 
@@ -360,8 +335,8 @@ def filter_tracks_with_scoring(driver, p):
 
         rows = func(driver, p)
         ids = [r["id"] for r in rows]
-        # print(score_key)
-        # print(ids)
+        print(score_key)
+        print(ids)
 
         # intersection if previous exists
         if candidate_ids is not None:
@@ -375,8 +350,8 @@ def filter_tracks_with_scoring(driver, p):
                     score_table[r["id"]][score_key] = r.get("score", 0.0)
 
         # early stop
-        # if not candidate_ids:
-        #     return []
+        if not candidate_ids:
+            return []
 
     # -------------------------------
     # Fetch final track names
@@ -456,8 +431,7 @@ def filter_tracks_with_scoring(driver, p):
         
         results.append({
             "track_id": tid,
-            "score_total": total,
-            "track_title": name_map.get(tid).get("track_title"),
+            "score_total": total
         })
 
     # 2. Sort by total score descending
@@ -465,17 +439,17 @@ def filter_tracks_with_scoring(driver, p):
     top15 = results[:15]
 
     # 3. Print the detailed records for the top 15
-    # print(f"\n--- Top {len(top15)} Search Results ---")
-    # for item in top15:
-    #     tid = item["track_id"]
-    #     full_record = name_map.get(tid)
+    print(f"\n--- Top {len(top15)} Search Results ---")
+    for item in top15:
+        tid = item["track_id"]
+        full_record = name_map.get(tid)
         
-    #     if full_record:
-    #         # Add the calculated score to the record so the printer can show it if needed
-    #         full_record["score_total"] = item["score_total"]
-    #         pretty_print_full(full_record)
-    #     else:
-    #         print(f"ID {tid}: Detailed data not found. Score: {item['score_total']}")
+        if full_record:
+            # Add the calculated score to the record so the printer can show it if needed
+            full_record["score_total"] = item["score_total"]
+            pretty_print_full(full_record)
+        else:
+            print(f"ID {tid}: Detailed data not found. Score: {item['score_total']}")
 
     return top15
 
@@ -490,7 +464,7 @@ def pretty_print_full(result):
     print(f"👁️ Views: {result.get('track_views', 'N/A')}")
     feats = None
     if result.get("featuring_artists"):
-        feats = " 🤝 Feat. " + ", ".join(result["featuring_artists"])
+        feats = "🤝 Feat. " + ", ".join(result["featuring_artists"])
     print(f"👤 Artist: {result['artist_name']}{feats if feats else ''}")
     print(f"🏷️ Genres: {', '.join(result['artist_genres'])}")
     print(f"🌎 Country: {result.get('country', 'N/A')}")
@@ -500,10 +474,10 @@ def pretty_print_full(result):
     print(f"🔥 Album Playcount: {result.get('album_playcount', 'N/A')}")
 
 
-# In[46]:
+# In[8]:
 
 
-def parse_parameters(input_json, HARD_MATCH=False):
+def parse_parameters(input_json):
     track = input_json.get("track", {}) or {}
     artist = input_json.get("artist", {}) or {}
 
@@ -525,17 +499,17 @@ def parse_parameters(input_json, HARD_MATCH=False):
         "track_views_from": track.get("views_from")[0] if isinstance(track.get("views_from"), list) else track.get("views_from"),
         "track_views_to": track.get("views_to")[0] if isinstance(track.get("views_to"), list) else track.get("views_to"),
         "track_genre_keywords": track.get("genres") or [],
-        "title_keywords_query": list_to_or_query(track.get("title_keywords"), HARD_MATCH),
-        "lyrics_keywords_query": list_to_or_query(track.get("lyrics_keywords"), HARD_MATCH),
+        "title_keywords_query": list_to_or_query(track.get("title_keywords")),
+        "lyrics_keywords_query": list_to_or_query(track.get("lyrics_keywords")),
         "lyrics_vector": lyrics_emb,
 
         # artist
-        "artist_name_keywords_query": list_to_or_query(artist.get("name_keywords"), HARD_MATCH),
+        "artist_name_keywords_query": list_to_or_query(artist.get("name_keywords")),
         "founded_year_from": artist.get("founded_year_from"),
         "founded_year_to": artist.get("founded_year_to"),
         "artist_genre_keywords": artist.get("genres") or [],
-        "artist_country": [] if artist.get("country", "") == "" else [artist.get("country")],
-        "artist_region": [] if artist.get("region", None) is None else [],
+        "artist_country": artist.get("country") or [],
+        "artist_region": artist.get("region") or [],
         "description_vector": desc_emb,
 
         # features
@@ -549,253 +523,49 @@ def parse_parameters(input_json, HARD_MATCH=False):
 
     return params
 
-def search_neo4j(input_json, HARD_MATCH=False):
+def miwa(input_json):
     driver = GraphDatabase.driver(uri, auth=(username, password))
 
-    params = parse_parameters(input_json, HARD_MATCH)
+    params = parse_parameters(input_json)
     results = filter_tracks_with_scoring(driver, params)
-    return results
 
 
-def match_track_names(name1: str, name2: str) -> bool:
-    """
-    Check if two track names match (non-strict).
-    Returns True if name1 is in name2 or name2 is in name1 (case-insensitive).
-    """
-    if not name1 or not name2:
-        return False
-    
-    name1_clean = name1.lower().strip()
-    name2_clean = name2.lower().strip()
-    
-    # Exact match
-    if name1_clean == name2_clean:
-        return True
-    
-    # Check if one contains the other
-    if name1_clean in name2_clean or name2_clean in name1_clean:
-        return True
-    
-    return False
+# In[22]:
 
 
-def calculate_accuracy(prompts_file: str = "data_parsing/data/generated_prompts.json"):
-    """
-    Calculate retrieval accuracy metrics (top-1, top-3, top-10, top-20).
-    """
-    print(f"Loading prompts from: {prompts_file}")
-    
-    try:
-        with open(prompts_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        print(f"❌ Error: File {prompts_file} not found!")
-        return None
-    
-    prompts_list = data.get('prompts', [])[:100]
-    print(f"Found {len(prompts_list)} prompts\n")
-    
-    if not prompts_list:
-        print("❌ No prompts found in file!")
-        return None
-    
-    # Initialize counters
-    total_tests = 0
-    top1_correct = 0
-    top3_correct = 0
-    top10_correct = 0
-    top15_correct = 0
-    
-    results = []
-    
-    print("=" * 80)
-    print("Calculating accuracy metrics...")
-    print("=" * 80)
-    
-    for i, entry in enumerate(prompts_list, 1):
-        track_id = entry.get('track_id')
-        expected_title = entry.get('title', '')
-        expected_artist = entry.get('artist_name', '')
-        extracted_json = entry.get('extracted_json', {})
-        
-        if not extracted_json:
-            print(f"[{i}/{len(prompts_list)}] ⚠️  No extracted_json found, skipping...")
-            continue
-        
-        if not expected_title:
-            print(f"[{i}/{len(prompts_list)}] ⚠️  No expected title found, skipping...")
-            continue
-        
-        print(f"\n[{i}/{len(prompts_list)}] Testing: {expected_title} - {expected_artist}")
-        
-        try:
-            # Retrieve songs using extracted JSON
-            retrieved_results = search_neo4j(extracted_json, HARD_MATCH=False)
-            
-            if not retrieved_results:
-                print(f"  ⚠️  No results retrieved")
-                results.append({
-                    "track_id": track_id,
-                    "expected_title": expected_title,
-                    "expected_artist": expected_artist,
-                    "found": False,
-                    "top1": False,
-                    "top3": False,
-                    "top10": False,
-                    "top15": False,
-                    "retrieved_count": 0
-                })
-                total_tests += 1
-                continue
-            
-            # Extract track titles from retrieved results
-            retrieved_titles = []
-            for result in retrieved_results:
-                #track = result.get('track', {})
-                retrieved_title = result.get('track_title', '')
-                if retrieved_title:
-                    retrieved_titles.append(retrieved_title)
-            
-            print(f"  Retrieved {len(retrieved_titles)} tracks")
-            
-            # Check matches at different top-K levels
-            top1_match = False
-            top3_match = False
-            top10_match = False
-            top15_match = False
-            
-            # Check top-1
-            if len(retrieved_titles) > 0:
-                if match_track_names(expected_title, retrieved_titles[0]):
-                    top1_match = True
-                    top1_correct += 1
-            
-            # Check top-3
-            if len(retrieved_titles) >= 3:
-                top3_titles = retrieved_titles[:3]
-            else:
-                top3_titles = retrieved_titles
-            
-            if any(match_track_names(expected_title, title) for title in top3_titles):
-                top3_match = True
-                top3_correct += 1
-            
-            # Check top-10
-            if len(retrieved_titles) >= 10:
-                top10_titles = retrieved_titles[:10]
-            else:
-                top10_titles = retrieved_titles
-            
-            if any(match_track_names(expected_title, title) for title in top10_titles):
-                top10_match = True
-                top10_correct += 1
-            
-            # Check top-15
-            if len(retrieved_titles) >= 15:
-                top15_titles = retrieved_titles[:15]
-            else:
-                top15_titles = retrieved_titles
-            
-            if any(match_track_names(expected_title, title) for title in top15_titles):
-                top15_match = True
-                top15_correct += 1
-            
-            # Print match status
-            match_status = []
-            if top1_match:
-                match_status.append("✅ Top-1")
-            if top3_match:
-                match_status.append("✅ Top-3")
-            if top10_match:
-                match_status.append("✅ Top-10")
-            if top15_correct:
-                match_status.append("✅ Top-15")
-            
-            if match_status:
-                print(f"  {' | '.join(match_status)}")
-            else:
-                print(f"  ❌ No match found")
-                if retrieved_titles:
-                    print(f"     Top retrieved: {retrieved_titles[0]}")
-            
-            results.append({
-                "track_id": track_id,
-                "expected_title": expected_title,
-                "expected_artist": expected_artist,
-                "found": len(retrieved_titles) > 0,
-                "top1": top1_match,
-                "top3": top3_match,
-                "top10": top10_match,
-                "top15": top15_correct,
-                "retrieved_count": len(retrieved_titles),
-                "top_retrieved_titles": retrieved_titles[:5]  # Store top 5 for debugging
-            })
-            
-            total_tests += 1
-            
-        except Exception as e:
-            print(f"  ❌ Error: {str(e)}")
-            results.append({
-                "track_id": track_id,
-                "expected_title": expected_title,
-                "expected_artist": expected_artist,
-                "error": str(e),
-                "found": False,
-                "top1": False,
-                "top3": False,
-                "top10": False,
-                "top15": False,
-                "retrieved_count": 0
-            })
-            total_tests += 1
-    
-    # Calculate accuracy metrics
-    if total_tests == 0:
-        print("\n❌ No tests completed!")
-        return None
-    
-    top1_accuracy = (top1_correct / total_tests) * 100
-    top3_accuracy = (top3_correct / total_tests) * 100
-    top10_accuracy = (top10_correct / total_tests) * 100
-    top15_accuracy = (top15_correct / total_tests) * 100
-    
-    # Print summary
-    print("\n" + "=" * 80)
-    print("ACCURACY SUMMARY")
-    print("=" * 80)
-    print(f"Total tests: {total_tests}")
-    print(f"\nTop-1 Accuracy:  {top1_correct}/{total_tests} = {top1_accuracy:.2f}%")
-    print(f"Top-3 Accuracy:  {top3_correct}/{total_tests} = {top3_accuracy:.2f}%")
-    print(f"Top-10 Accuracy: {top10_correct}/{total_tests} = {top10_accuracy:.2f}%")
-    print(f"Top-15 Accuracy: {top15_correct}/{total_tests} = {top15_accuracy:.2f}%")
-    print("=" * 80)
-    
-    # Save detailed results
-    output_data = {
-        "summary": {
-            "total_tests": total_tests,
-            "top1_accuracy": top1_accuracy,
-            "top3_accuracy": top3_accuracy,
-            "top10_accuracy": top10_accuracy,
-            "top15_accuracy": top15_accuracy,
-            "top1_correct": top1_correct,
-            "top3_correct": top3_correct,
-            "top10_correct": top10_correct,
-            "top15_correct": top15_correct
-        },
-        "detailed_results": results
+input_json =  {
+    "track": {
+        # "title_keywords": ["father", "son"],
+        # "title_keywords": ["dunkelheit"],
+        "title_keywords": [],
+        "year_from": 1970,
+        "year_to": 1999,
+        "genres": ["rock", "metal"],
+        "views_from": [100],
+        "views_to": [10000000],
+        # "lyrics_keywords": ["lightning", "thunder"],
+        "lyrics_keywords": [],
+        # "lyrics_text": "from father to son"
+        "lyrics_text": ""
+    },
+    "artist": {
+        "name_keywords": [],
+        "founded_year_from": 1,
+        "founded_year_to": 2299,
+        "genres": ["metal"],
+        # "country": ["Sweden"],
+        "country": [],
+        # "region": ["Europe"],
+        "region": [],
+        "description_keywords": [],
+        "description_text": "Scandinavian black metal band named bathory"
+    },
+    "features": [],
+    "album": {
+        "name_keywords": ["fire"],
+        "views_from": None,
+        "views_to": None
     }
-    
-    output_file = "accuracy_results.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(output_data, f, indent=2, ensure_ascii=False)
-    
-    print(f"\n📄 Detailed results saved to: {output_file}")
-    
-    return output_data
-
-
-if __name__ == "__main__":
-    calculate_accuracy()
-
+}
+miwa(input_json)
 
