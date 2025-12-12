@@ -8,6 +8,549 @@ from typing import Optional, Dict, List
 
 load_dotenv()
 
+# Import Neo4j retriever
+import random
+import json
+from neo4j import GraphDatabase, basic_auth
+
+import torch
+from transformers import AutoModel
+import os
+import numpy as np
+from neo4j import GraphDatabase
+from typing import Dict, Any, List, Optional, Tuple
+from numpy.linalg import norm
+from dotenv import load_dotenv
+load_dotenv()
+
+import os
+from dotenv import load_dotenv
+from neo4j import GraphDatabase
+from collections import defaultdict
+import torch
+from transformers import AutoModel
+import numpy as np
+import json
+
+load_dotenv()
+
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+    print("Using MPS")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+    print("Using NVIDIA CUDA GPU")
+else:
+    device = torch.device("cpu")
+    print("Using CPU")
+
+model_name = "jinaai/jina-embeddings-v3"
+model = AutoModel.from_pretrained(model_name, trust_remote_code=True)
+model.to(device)
+
+uri = os.environ.get("NEO4J_URI")
+username = os.environ.get("NEO4J_USERNAME")
+password = os.environ.get("NEO4J_PASSWORD")
+driver = GraphDatabase.driver(uri, auth=(username, password))
+
+def embed_text(text):
+    if text in [None, "", []]:
+        return None
+    if isinstance(text, list):
+        text = next((t for t in text if t not in [None, ""]), None)
+        if text is None:
+            return None
+    emb = model.encode([text], truncate_dim=1024)
+    return emb.tolist()[0]
+
+def run_query(driver, cypher, params):
+    with driver.session() as s:
+        return s.run(cypher, params).data()
+
+
+def list_to_or_query(items):
+    if not items:
+        return None
+    clean = [str(x).strip() for x in items if str(x).strip()]
+    return " OR ".join(clean) if clean else None
+
+
+# -------------------------------------------
+# Atomic filters mirroring the prompt
+# -------------------------------------------
+
+
+def title_filter(driver, params):
+    q = """
+    CALL db.index.fulltext.queryNodes("track_title_fulltext", $title_keywords_query)
+    YIELD node, score
+    RETURN elementId(node) AS id, score
+    """
+    return run_query(driver, q, params)
+
+
+def all_tracks_filter(driver, params):
+    q = """
+    MATCH (t:Track)
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+
+def track_numeric_filter(driver, params):
+    q = """
+    MATCH (t:Track)
+    WHERE
+        ($track_year_from IS NULL OR t.year >= $track_year_from)
+        AND ($track_year_to IS NULL OR t.year <= $track_year_to)
+        AND ($track_views_from IS NULL OR t.views >= $track_views_from)
+        AND ($track_views_to IS NULL OR t.views <= $track_views_to)
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+
+def lyrics_ft_filter(driver, params):
+    q = """
+    CALL db.index.fulltext.queryNodes("lyrics_fulltext", $lyrics_keywords_query)
+    YIELD node, score
+    MATCH (t:Track)-[:HAS_LYRICS]->(node)
+    RETURN elementId(t) AS id, score
+    """
+    return run_query(driver, q, params)
+
+def lyrics_vec_filter(driver, params):
+    q = """
+    CALL db.index.vector.queryNodes("embedding_l_vector", 50, $lyrics_vector)
+    YIELD node, score
+    MATCH (lyr:Lyrics)-[:HAS_EMBEDDING]->(node)
+    MATCH (t:Track)-[:HAS_LYRICS]->(lyr)
+    RETURN elementId(t) AS id, score
+    """
+    return run_query(driver, q, params)
+
+def artist_name_filter(driver, params):
+    q = """
+    CALL db.index.fulltext.queryNodes("artist_name_fulltext", $artist_name_keywords_query)
+    YIELD node, score
+    MATCH (node)<-[:PERFORMED_BY]-(t:Track)
+    RETURN elementId(t) AS id, score
+    """
+    return run_query(driver, q, params)
+
+def artist_description_vec_filter(driver, params):
+    q = """
+    CALL db.index.vector.queryNodes("embedding_d_vector", 50, $description_vector)
+    YIELD node, score
+    MATCH (desc:Description)-[:HAS_EMBEDDING]->(node)
+    MATCH (a:Artist)-[:HAS_DESCRIPTION]->(desc)
+    MATCH (a)<-[:PERFORMED_BY]-(t:Track)
+    RETURN elementId(t) AS id, score
+    """
+    return run_query(driver, q, params)
+
+
+def artist_numeric_filter(driver, params):
+    q = """
+    MATCH (t:Track)-[:PERFORMED_BY]->(a:Artist)
+    WHERE
+        ($founded_year_from IS NULL OR a.founded_year >= $founded_year_from)
+        AND ($founded_year_to IS NULL OR a.founded_year <= $founded_year_to)
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+def location_filter(driver, params):
+    q = """
+    MATCH (t:Track)-[:PERFORMED_BY]->(a:Artist)-[:FOUNDED_IN]->(loc)
+    WHERE
+        (
+            ($artist_country IS NULL OR size($artist_country) = 0 OR $artist_country = [""])
+            AND ($artist_region IS NULL OR size($artist_region) = 0 OR $artist_region = [""])
+        )
+        OR
+        (
+            ($artist_region IS NOT NULL AND size($artist_region) > 0 AND $artist_region <> [""])
+            AND (
+                (loc:Region AND loc.name IN $artist_region)
+                OR (loc:Country AND EXISTS {
+                    MATCH (loc)-[:LOCATED_IN]->(r:Region)
+                    WHERE r.name IN $artist_region
+                })
+            )
+        )
+        OR
+        (
+            ($artist_region IS NULL OR size($artist_region) = 0 OR $artist_region = [""])
+            AND ($artist_country IS NOT NULL AND size($artist_country) > 0 AND $artist_country <> [""])
+            AND loc:Country AND loc.name IN $artist_country
+        )
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+
+def artist_genre_filter(driver, params):
+    q = """
+    UNWIND $artist_genre_keywords AS kw
+    CALL {
+        WITH kw
+        CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
+        RETURN node ORDER BY score DESC LIMIT 1
+    }
+    WITH collect(distinct node) AS top_nodes
+    UNWIND top_nodes AS node
+    MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
+    WITH collect(distinct sub) AS allowed
+    MATCH (t:Track)-[:PERFORMED_BY]->(a:Artist)-[:PERFORMS_GENRE]->(g:Genre)
+    WHERE g IN allowed
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+
+def track_genre_filter(driver, params):
+    q = """
+    UNWIND $track_genre_keywords AS kw
+    CALL {
+        WITH kw
+        CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
+        RETURN node ORDER BY score DESC LIMIT 1
+    }
+    WITH collect(distinct node) AS top_nodes
+    UNWIND top_nodes AS node
+    MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
+    WITH collect(distinct sub) AS allowed
+    MATCH (t:Track)-[:HAS_GENRE]->(g:Genre)
+    WHERE g IN allowed
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+
+def features_filter(driver, params):
+    q = """
+    UNWIND $features AS kw
+    CALL {
+        WITH kw
+        CALL db.index.fulltext.queryNodes("artist_name_fulltext", kw) YIELD node, score
+        RETURN node ORDER BY score DESC LIMIT 1
+    }
+    WITH collect(distinct node) AS allowed_feature_artists
+    MATCH (t:Track)-[:FEATURING]->(feat:Artist)
+    WHERE feat IN allowed_feature_artists
+    RETURN elementId(t) AS id
+    """
+    return run_query(driver, q, params)
+
+# def album_filter(driver, params):
+#     q = """
+#     MATCH (t:Track)-[:APPEARS_ON]->(alb:Album)
+#     WHERE
+#         ($album_views_from IS NULL OR alb.playcount >= $album_views_from)
+#         AND ($album_views_to IS NULL OR alb.playcount <= $album_views_to)
+#         AND (
+#             $album_name_keywords IS NULL OR size($album_name_keywords) = 0 OR $album_name_keywords = [""]
+#             OR EXISTS {
+#                 UNWIND $album_name_keywords AS kw
+#                 CALL db.index.fulltext.queryNodes("album_name_fulltext", kw) YIELD node, score
+#                 WITH node, score ORDER BY score DESC LIMIT 1
+#                 WHERE node = alb
+#             }
+#         )
+#     RETURN elementId(t) AS id
+#     """
+#     return run_query(driver, q, params)
+def album_filter(driver, params):
+    q = """
+    CALL {
+        WITH $album_name_keywords AS kws
+        WHERE kws IS NOT NULL AND size(kws) > 0 AND kws[0] <> ""
+        
+        WITH apoc.text.join($album_name_keywords, " OR ") AS queryStr
+        CALL db.index.fulltext.queryNodes("album_name_fulltext", queryStr) YIELD node, score
+        RETURN node AS alb, score
+        
+        UNION
+        
+        WITH $album_name_keywords AS kws
+        WHERE kws IS NULL OR size(kws) = 0 OR kws[0] = ""
+        MATCH (alb:Album)
+        RETURN alb, 0.0 AS score
+    }
+
+    WITH alb, score
+    WHERE ($album_views_from IS NULL OR alb.playcount >= $album_views_from)
+    AND ($album_views_to IS NULL OR alb.playcount <= $album_views_to)
+
+    ORDER BY score DESC, alb.playcount DESC
+    LIMIT 30
+
+    MATCH (t:Track)-[:APPEARS_ON]->(alb)
+    RETURN 
+        elementId(t) AS id, 
+        score 
+    """
+    return run_query(driver, q, params)
+
+# -------------------------------------------
+# Main filtering logic
+# -------------------------------------------
+
+
+def filter_tracks_with_scoring(driver, p):
+    score_table = defaultdict(lambda: defaultdict(float))
+    candidate_ids = None
+
+    # Ordered by likely selectivity
+    filter_sequence = [("filter_track_numeric", track_numeric_filter)]
+
+    if p.get("title_keywords_query"):
+        filter_sequence.append(("score_title", title_filter))
+
+    if p.get("lyrics_keywords_query"):
+        filter_sequence.append(("score_lyrics_ft", lyrics_ft_filter))
+
+    if p.get("lyrics_vector"):
+        # print("lyrics")
+        filter_sequence.append(("score_lyrics_vec", lyrics_vec_filter))
+
+    if p.get("artist_name_keywords_query"):
+        filter_sequence.append(("score_artist_name", artist_name_filter))
+    # print(p.get("description_vector"))
+    # print(p.get("lyrics_vector"))
+    if p.get("description_vector"):
+        # print("desc")
+        filter_sequence.append(("score_artist_desc", artist_description_vec_filter))
+
+    if p.get("track_genre_keywords"):
+        filter_sequence.append(("filter_track_genre", track_genre_filter))
+
+    if p.get("artist_genre_keywords"):
+        filter_sequence.append(("filter_artist_genre", artist_genre_filter))
+
+    if p.get("features"):
+        filter_sequence.append(("filter_features", features_filter))
+
+    if p.get("artist_country") or p.get("artist_region"):
+        filter_sequence.append(("filter_location", location_filter))
+
+    if p.get("founded_year_from") or p.get("founded_year_to"):
+        filter_sequence.append(("filter_artist_numeric", artist_numeric_filter))
+
+    if p.get("album_name_keywords") or p.get("album_views_from") or p.get("album_views_to"):
+        filter_sequence.append(("score_filter_album", album_filter))
+
+    if not filter_sequence:
+        filter_sequence.append(("filter_all", all_tracks_filter))
+
+    # -------------------------------
+    # Execute filters one by one
+    # -------------------------------
+    for score_key, func in filter_sequence:
+
+        rows = func(driver, p)
+        ids = [r["id"] for r in rows]
+        #print(score_key)
+        # print(ids)
+
+        # intersection if previous exists
+        if candidate_ids is not None:
+            ids = list(set(candidate_ids) & set(ids))
+        candidate_ids = ids
+
+        # assign scores only if this is scoring filter
+        if score_key.startswith("score_"):
+            for r in rows:
+                if r["id"] in candidate_ids:
+                    score_table[r["id"]][score_key] = r.get("score", 0.0)
+
+        # early stop
+        if not candidate_ids:
+            return []
+
+    # -------------------------------
+    # Fetch final track names
+    # -------------------------------
+
+    if not candidate_ids:
+        return []
+
+    name_query = """
+    MATCH (t:Track)
+    WHERE elementId(t) IN $ids
+
+    // artist(s)
+    OPTIONAL MATCH (t)-[:PERFORMED_BY]->(artist:Artist)
+    OPTIONAL MATCH (t)-[:FEATURING]->(feat:Artist)
+
+    // album
+    OPTIONAL MATCH (t)-[:APPEARS_ON]->(al:Album)
+
+    // genres
+    OPTIONAL MATCH (t)-[:HAS_GENRE]->(g:Genre)
+
+    // lyrics + embeddings (if needed)
+    OPTIONAL MATCH (t)-[:HAS_LYRICS]->(ly:Lyrics)
+
+    // artist → country → region → planet
+    OPTIONAL MATCH (artist)-[:FOUNDED_IN]->(c:Country)
+    OPTIONAL MATCH (c)-[:LOCATED_IN]->(r:Region)
+    OPTIONAL MATCH (artist)-[:PERFORMS_GENRE]->(ag:Genre)
+
+    // description
+    OPTIONAL MATCH (artist)-[:HAS_DESCRIPTION]->(desc:Description)
+
+    RETURN
+        elementId(t) AS track_id,
+        t.title AS track_title,
+        t.views AS track_views,
+        t.year AS track_year,
+
+        artist.name AS artist_name,
+        artist.founded_year AS artist_founded_year,
+
+        al.name AS album_name,
+        al.playcount AS album_playcount,
+
+        collect(DISTINCT g.name) AS genres,
+        collect(DISTINCT ag.name) AS artist_genres,
+        collect(DISTINCT feat.name) AS featuring_artists,
+
+        c.name AS country,
+        r.name AS region,
+
+        ly.text AS lyrics,
+        desc.text AS description
+
+    """
+    
+    names = run_query(driver, name_query, {"ids": candidate_ids})
+    #print(names)
+    print("Total retrieved: ", len(names))
+    # name_map = {r["track_id"]: r["track_title"] for r in names}
+    name_map = {r["track_id"]: r for r in names}
+    
+    results = []
+    for tid in candidate_ids:
+        scores = score_table[tid]
+        # Use max of full-text or vector lyrics scores
+        # lyrics_score = max(scores.get("score_lyrics_ft", 0.0), scores.get("score_lyrics_vec", 0.0))
+        
+        total = (
+            scores.get("score_title", 0.0)
+            + scores.get("score_lyrics_ft", 0.0)
+            + scores.get("score_lyrics_vec", 0.0)
+            + scores.get("score_artist_name", 0.0)
+            + scores.get("score_artist_desc", 0.0)
+            + scores.get("score_filter_album", 0.0)
+        )
+        
+        results.append({
+            "track_id": tid,
+            "score_total": total, 
+            "track_title": name_map.get(tid).get("track_title"),
+        })
+    # 2. Sort by total score descending
+    results.sort(key=lambda x: x["score_total"], reverse=True)
+    top15 = results[:15]
+
+    # 3. Print the detailed records for the top 15
+    # print(f"\n--- Top {len(top15)} Search Results ---")
+    # for item in top15:
+    #     tid = item["track_id"]
+    #     full_record = name_map.get(tid)
+        
+    #     if full_record:
+    #         # Add the calculated score to the record so the printer can show it if needed
+    #         full_record["score_total"] = item["score_total"]
+    #         pretty_print_full(full_record)
+    #     else:
+    #         print(f"ID {tid}: Detailed data not found. Score: {item['score_total']}")
+
+    return top15
+
+
+
+def pretty_print_full(result):
+    print("\n================ TRACK ==================")
+    print(f"🎯 Score: {result['score_total']}")
+    print(f"🎵 Title: {result['track_title']}")
+    print(f"📅 Year: {result.get('track_year', 'N/A')}")
+    print(f"🏷️ Genre(s): {', '.join(result.get('genres', []))}")
+    print(f"👁️ Views: {result.get('track_views', 'N/A')}")
+    feats = None
+    if result.get("featuring_artists"):
+        feats = "🤝 Feat. " + ", ".join(result["featuring_artists"])
+    print(f"👤 Artist: {result['artist_name']}{feats if feats else ''}")
+    print(f"🏷️ Genres: {', '.join(result['artist_genres'])}")
+    print(f"🌎 Country: {result.get('country', 'N/A')}")
+    print(f"🗺️ Region: {result.get('region', 'N/A')}")
+
+    print(f"💿 Album: {result.get('album_name', 'N/A')}")
+    print(f"🔥 Album Playcount: {result.get('album_playcount', 'N/A')}")
+
+def parse_parameters(input_json):
+    track = input_json.get("track", {}) or {}
+    artist = input_json.get("artist", {}) or {}
+
+    album = input_json.get("album", {}) or {}
+    features = input_json.get("features", []) or []
+    # print(artist)
+    # print(track)
+    # print(album)
+    # print(features)
+    
+    lyrics_emb = embed_text(track.get("lyrics_text")) if track.get("lyrics_text") else []
+    desc_emb = embed_text(artist.get("description_text")) if artist.get("description_text") else []
+    params = {
+        "metadata_limit": input_json.get("metadata_limit", 15),
+
+        # track
+        "track_year_from": track.get("year_from"),
+        "track_year_to": track.get("year_to"),
+        "track_views_from": track.get("views_from")[0] if isinstance(track.get("views_from"), list) else track.get("views_from"),
+        "track_views_to": track.get("views_to")[0] if isinstance(track.get("views_to"), list) else track.get("views_to"),
+        "track_genre_keywords": track.get("genres") or [],
+        "title_keywords_query": list_to_or_query(track.get("title_keywords")),
+        "lyrics_keywords_query": list_to_or_query(track.get("lyrics_keywords")),
+        "lyrics_vector": lyrics_emb,
+
+        # artist
+        "artist_name_keywords_query": list_to_or_query(artist.get("name_keywords")),
+        "founded_year_from": artist.get("founded_year_from"),
+        "founded_year_to": artist.get("founded_year_to"),
+        "artist_genre_keywords": artist.get("genres") or [],
+        "artist_country": [artist.get("country")] or [],
+        "artist_region": artist.get("region") or [],
+        "description_vector": desc_emb,
+
+        # features
+        "features": features or [],
+
+        # album
+        "album_name_keywords": album.get("name_keywords") or [],
+        "album_views_from": album.get("views_from"),
+        "album_views_to": album.get("views_to"),
+    }
+
+    return params
+
+def search_neo4j(input_json):
+    driver = GraphDatabase.driver(uri, auth=(username, password))
+
+    params = parse_parameters(input_json)
+    results = filter_tracks_with_scoring(driver, params)
+
+    return results
+        
+
+
+
+
+
+
+
 # Initialize Anthropic client
 api_key = os.getenv("ANTHROPIC_API_KEY")
 if not api_key:
@@ -98,6 +641,7 @@ Extract structured information from the user query into the following fields:
 - genres: List of genres mentioned (e.g., ["rock", "pop"]). Use lowercase.
 - lyrics_keywords: List of keywords from lyrics mentioned (e.g., ["rain", "tears"] if user mentions these words)
 - lyrics_text: A descriptive query for when the user mentions actual lyrics content, parts of lyrics, approximate lyrics or song topic (e.g., "songs with 'tears' in the lyrics" → "tears and crying", "I remember when..." → "songs about memories", "song about a man who had a farm  " → "a man who had a farm"). This is NOT exact lyrics, but a description of the lyrical content referenced (or could be an exact lyric if explicitly mentioned)
+- views_from and views_to: Ignore these fields - do not extract them from the query
 
 **ARTIST INFORMATION:**
 - name_keywords: List of keywords from artist name mentioned (e.g., ["beatles"] if user says "songs by The Beatles")
@@ -114,6 +658,7 @@ Extract structured information from the user query into the following fields:
 
 **ALBUM INFORMATION:**
 - name_keywords: List of keywords from album name mentioned
+- views_from and views_to: Ignore these fields - do not extract them from the query
 
 Output ONLY valid XML with no additional text, comments, or explanations.
 </OBJECTIVE>
@@ -297,7 +842,7 @@ Now output ONLY the XML response with no additional text:"""
                     title_keywords = parse_list_element(track_elem, "title_keywords", "keyword")
                     track_field("track.title_keywords", title_keywords_elem, title_keywords, is_list=True)
                 except Exception as e:
-                    title_keywords = []
+                    title_keywords = ["a"]  # Workaround: add "a" if parsing fails
                     debug_info["parsing_errors"].append(f"track.title_keywords: {str(e)}")
                 
                 try:
@@ -340,20 +885,28 @@ Now output ONLY the XML response with no additional text:"""
                     lyrics_text = None
                     debug_info["parsing_errors"].append(f"track.lyrics_text: {str(e)}")
                 
+                # Workaround: if title_keywords is empty, add "a"
+                if not title_keywords:
+                    title_keywords = ["a"]
+                
                 track = {
                     "title_keywords": title_keywords,
                     "year_from": year_from,
                     "year_to": year_to,
                     "genres": genres,
+                    "views_from": None,
+                    "views_to": None,
                     "lyrics_keywords": lyrics_keywords,
                     "lyrics_text": lyrics_text
                 }
             else:
                 track = {
-                    "title_keywords": [],
+                    "title_keywords": ["a"],  # Workaround: add "a" if empty
                     "year_from": None,
                     "year_to": None,
                     "genres": [],
+                    "views_from": None,
+                    "views_to": None,
                     "lyrics_keywords": [],
                     "lyrics_text": None
                 }
@@ -397,10 +950,12 @@ Now output ONLY the XML response with no additional text:"""
                 
                 try:
                     country_elem = artist_elem.find("country")
-                    country = parse_text_or_none(country_elem)
+                    country_text = parse_text_or_none(country_elem)
+                    # Use empty string instead of None for country
+                    country = country_text if country_text is not None else ""
                     track_field("artist.country", country_elem, country)
                 except Exception as e:
-                    country = None
+                    country = ""
                     debug_info["parsing_errors"].append(f"artist.country: {str(e)}")
                 
                 try:
@@ -421,10 +976,12 @@ Now output ONLY the XML response with no additional text:"""
                 
                 try:
                     description_text_elem = artist_elem.find("description_text")
-                    description_text = parse_text_or_none(description_text_elem)
+                    description_text_value = parse_text_or_none(description_text_elem)
+                    # Use empty string instead of None for description_text
+                    description_text = description_text_value if description_text_value is not None else ""
                     track_field("artist.description_text", description_text_elem, description_text)
                 except Exception as e:
-                    description_text = None
+                    description_text = ""
                     debug_info["parsing_errors"].append(f"artist.description_text: {str(e)}")
                 
                 artist = {
@@ -432,10 +989,10 @@ Now output ONLY the XML response with no additional text:"""
                     "founded_year_from": founded_year_from,
                     "founded_year_to": founded_year_to,
                     "genres": artist_genres,
-                    "country": country,
+                    "country": country if country is not None else "",
                     "region": region,
                     "description_keywords": description_keywords,
-                    "description_text": description_text
+                    "description_text": description_text if description_text is not None else ""
                 }
             else:
                 artist = {
@@ -443,10 +1000,10 @@ Now output ONLY the XML response with no additional text:"""
                     "founded_year_from": None,
                     "founded_year_to": None,
                     "genres": [],
-                    "country": None,
+                    "country": "",
                     "region": None,
                     "description_keywords": [],
-                    "description_text": None
+                    "description_text": ""
                 }
                 debug_info["missing_fields"].append("artist: element not found")
             
@@ -474,16 +1031,22 @@ Now output ONLY the XML response with no additional text:"""
                     album_name_keywords = parse_list_element(album_elem, "name_keywords", "keyword")
                     track_field("album.name_keywords", album_name_keywords_elem, album_name_keywords, is_list=True)
                     album = {
-                        "name_keywords": album_name_keywords
+                        "name_keywords": album_name_keywords,
+                        "views_from": [],
+                        "views_to": []
                     }
                 except Exception as e:
                     album = {
-                        "name_keywords": []
+                        "name_keywords": [],
+                        "views_from": [],
+                        "views_to": []
                     }
                     debug_info["parsing_errors"].append(f"album.name_keywords: {str(e)}")
             else:
                 album = {
-                    "name_keywords": []
+                    "name_keywords": [],
+                    "views_from": [],
+                    "views_to": []
                 }
                 debug_info["missing_fields"].append("album: element not found in XML")
             
@@ -497,7 +1060,7 @@ Now output ONLY the XML response with no additional text:"""
                 "album": album,
                 "_debug": debug_info
             }
-            #json.dump(result, open("result.json", "w"), indent=4)
+            json.dump(result, open("result.json", "w"), indent=4)
             return result
             
         except ET.ParseError as e:
@@ -512,10 +1075,12 @@ Now output ONLY the XML response with no additional text:"""
             print_debug_info(debug_info)
             return {
                 "track": {
-                    "title_keywords": [],
+                    "title_keywords": ["a"],
                     "year_from": None,
                     "year_to": None,
                     "genres": [],
+                    "views_from": None,
+                    "views_to": None,
                     "lyrics_keywords": [],
                     "lyrics_text": None
                 },
@@ -524,14 +1089,16 @@ Now output ONLY the XML response with no additional text:"""
                     "founded_year_from": None,
                     "founded_year_to": None,
                     "genres": [],
-                    "country": None,
+                    "country": "",
                     "region": None,
                     "description_keywords": [],
-                    "description_text": None
+                    "description_text": ""
                 },
                 "features": [],
                 "album": {
-                    "name_keywords": []
+                    "name_keywords": [],
+                    "views_from": [],
+                    "views_to": []
                 },
                 "_debug": debug_info
             }
@@ -547,10 +1114,12 @@ Now output ONLY the XML response with no additional text:"""
         print_debug_info(debug_info)
         return {
             "track": {
-                "title_keywords": [],
+                "title_keywords": ["a"],
                 "year_from": None,
                 "year_to": None,
                 "genres": [],
+                "views_from": None,
+                "views_to": None,
                 "lyrics_keywords": [],
                 "lyrics_text": None
             },
@@ -559,206 +1128,59 @@ Now output ONLY the XML response with no additional text:"""
                 "founded_year_from": None,
                 "founded_year_to": None,
                 "genres": [],
-                "country": None,
+                "country": "",
                 "region": None,
                 "description_keywords": [],
-                "description_text": None
+                "description_text": ""
             },
             "features": [],
             "album": {
-                "name_keywords": []
+                "name_keywords": [],
+                "views_from": [],
+                "views_to": []
             },
             "_debug": debug_info
         }
 
 
-def static_retrieval(extracted_fields: Dict) -> List[Dict]:
+def retrieve_songs(extracted_fields: Dict) -> List[Dict]:
     """
-    Static retrieval function - returns mock song data based on extracted fields.
-    In a real implementation, this would query the Neo4j GraphRAG database.
+    Retrieve songs from Neo4j GraphRAG database using extracted fields.
     """
+    # Remove debug info if present
+    query_json = {k: v for k, v in extracted_fields.items() if k != "_debug"}
     
-    track_info = extracted_fields.get("track", {})
-    artist_info = extracted_fields.get("artist", {})
-    
-    # Extract simple filters from the nested structure
-    genres = track_info.get("genres", []) or artist_info.get("genres", [])
-    genre = genres[0] if genres else None
-    
-    location = artist_info.get("country") or artist_info.get("region")
-    
-    artist_keywords = artist_info.get("name_keywords", [])
-    artist = artist_keywords[0] if artist_keywords else None
-    
-    # Region to countries mapping
-    region_to_countries = {
-        "europe": ["United Kingdom", "France", "Germany", "Spain", "Ireland", "Croatia", "Belgium"],
-        "north america": ["United States", "Canada", "Puerto Rico"],
-        "south america": ["Brasil", "Argentina", "Columbia"],
-        "asia": ["South Korea", "Indonesia"],
-        "oceania": ["Australia", "New Zealand"]
-    }
-    
-    # Mock song database for demonstration (with region info)
-    mock_songs = [
-        {
-            "title": "Bohemian Rhapsody",
-            "artist": "Queen",
-            "genre": "rock",
-            "country": "United Kingdom",
-            "region": "Europe",
-            "year": 1975,
-            "description": "A progressive rock epic with operatic sections"
-        },
-        {
-            "title": "Lose Yourself",
-            "artist": "Eminem",
-            "genre": "hip hop",
-            "country": "United States",
-            "region": "North America",
-            "year": 2002,
-            "description": "Motivational rap song about seizing opportunities"
-        },
-        {
-            "title": "La Vie En Rose",
-            "artist": "Édith Piaf",
-            "genre": "chanson",
-            "country": "France",
-            "region": "Europe",
-            "year": 1945,
-            "description": "Classic French chanson about love and life"
-        },
-        {
-            "title": "Stairway to Heaven",
-            "artist": "Led Zeppelin",
-            "genre": "rock",
-            "country": "United Kingdom",
-            "region": "Europe",
-            "year": 1971,
-            "description": "Epic rock ballad with acoustic and electric sections"
-        },
-        {
-            "title": "Shape of You",
-            "artist": "Ed Sheeran",
-            "genre": "pop",
-            "country": "United Kingdom",
-            "region": "Europe",
-            "year": 2017,
-            "description": "Catchy pop song with tropical house influences"
-        },
-        {
-            "title": "Gangnam Style",
-            "artist": "PSY",
-            "genre": "k-pop",
-            "country": "South Korea",
-            "region": "Asia",
-            "year": 2012,
-            "description": "Viral K-pop dance song"
-        },
-        {
-            "title": "Hotel California",
-            "artist": "Eagles",
-            "genre": "rock",
-            "country": "United States",
-            "region": "North America",
-            "year": 1976,
-            "description": "Classic rock song with mysterious lyrics"
-        },
-        {
-            "title": "Blinding Lights",
-            "artist": "The Weeknd",
-            "genre": "pop",
-            "country": "Canada",
-            "region": "North America",
-            "year": 2019,
-            "description": "Synth-pop song with 80s influences"
-        },
-        {
-            "title": "Down Under",
-            "artist": "Men at Work",
-            "genre": "pop",
-            "country": "Australia",
-            "region": "Oceania",
-            "year": 1981,
-            "description": "Iconic Australian pop song"
-        },
-        {
-            "title": "Garota de Ipanema",
-            "artist": "Antônio Carlos Jobim",
-            "genre": "bossa nova",
-            "country": "Brasil",
-            "region": "South America",
-            "year": 1962,
-            "description": "Classic Brazilian bossa nova"
-        }
-    ]
-    
-    # Simple filtering logic
-    filtered_songs = []
-    for song in mock_songs:
-        match = True
+    try:
+        # Initialize Neo4j retriever
+        uri = os.getenv("NEO4J_URI")
+        username = os.getenv("NEO4J_USERNAME")
+        password = os.getenv("NEO4J_PASSWORD")
         
-        # Filter by genre
-        if genres:
-            genre_match = any(
-                g.lower() in song["genre"].lower() or song["genre"].lower() in g.lower()
-                for g in genres
-            )
-            if not genre_match:
-                match = False
+        if not all([uri, username, password]):
+            st.error("Neo4j credentials not configured. Please set NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD in your environment variables.")
+            return []
         
-        # Filter by location (country or region)
-        if location:
-            location_lower = location.lower()
-            # Check if location matches country
-            country_match = song["country"].lower() == location_lower
-            # Check if location matches region
-            region_match = song["region"].lower() == location_lower
-            # Check if location is a region and song's country is in that region
-            region_country_match = False
-            if location_lower in region_to_countries:
-                region_country_match = song["country"] in region_to_countries[location_lower]
+        results = search_neo4j(query_json)
+        
+        # Format results for display
+        formatted_songs = []
+        for result in results:
+            track = result.get("track_title", {})
+            score = result.get("score_total", {})
             
-            if not (country_match or region_match or region_country_match):
-                match = False
+            # Extract track properties
+            song_data = {
+                "title": track.get("title", "Unknown"),
+                "_id": track.get("_id"),
+                "_score": score.get("total", 0)
+            }
+            formatted_songs.append(song_data)
         
-        # Filter by artist name keywords
-        if artist_keywords:
-            artist_match = any(
-                keyword.lower() in song["artist"].lower()
-                for keyword in artist_keywords
-            )
-            if not artist_match:
-                match = False
-        
-        # Filter by year range
-        year_from = track_info.get("year_from")
-        year_to = track_info.get("year_to")
-        if year_from is not None and song.get("year") is not None:
-            if song["year"] < year_from:
-                match = False
-        if year_to is not None and song.get("year") is not None:
-            if song["year"] > year_to:
-                match = False
-        
-        # Filter by title keywords
-        title_keywords = track_info.get("title_keywords", [])
-        if title_keywords:
-            title_match = any(
-                keyword.lower() in song["title"].lower()
-                for keyword in title_keywords
-            )
-            if not title_match:
-                match = False
-        
-        if match:
-            filtered_songs.append(song)
-    
-    # If no matches, return all songs (or a subset)
-    if not filtered_songs:
-        return mock_songs[:5]  # Return first 5 as fallback
-    
-    return filtered_songs[:10]  # Return up to 10 matches
+        return formatted_songs
+            
+    except Exception as e:
+        st.error(f"Error retrieving songs from Neo4j: {e}")
+        return []
 
 
 def generate_song_suggestions(retrieved_songs: List[Dict], user_query: str, extracted_fields: Dict) -> str:
@@ -768,7 +1190,7 @@ def generate_song_suggestions(retrieved_songs: List[Dict], user_query: str, extr
     
     # Format retrieved songs for the prompt
     songs_text = "\n".join([
-        f"- **{song['title']}** by {song['artist']} ({song['year']}) - {song['genre']} from {song['country']} ({song.get('region', 'N/A')}). {song['description']}"
+        f"- **{song['title']}**"
         for song in retrieved_songs
     ])
     
@@ -900,7 +1322,7 @@ if prompt := st.chat_input("Describe the song you're looking for..."):
             
             # Step 2: Retrieve songs
             with st.spinner("Searching database..."):
-                retrieved_songs = static_retrieval(extracted_fields)
+                retrieved_songs = retrieve_songs(extracted_fields)
             
             # Step 3: Generate suggestions
             with st.spinner("Generating recommendations..."):
@@ -914,9 +1336,13 @@ if prompt := st.chat_input("Describe the song you're looking for..."):
                 if retrieved_songs:
                     import pandas as pd
                     df = pd.DataFrame(retrieved_songs)
-                    display_cols = ["title", "artist", "genre", "country", "region", "year"]
+                    display_cols = ["title", "artist", "genre", "country", "region", "year", "_score"]
                     # Only show columns that exist
                     available_cols = [col for col in display_cols if col in df.columns]
+                    # Rename _score for display
+                    if "_score" in available_cols:
+                        df = df.rename(columns={"_score": "relevance_score"})
+                        available_cols = [col if col != "_score" else "relevance_score" for col in available_cols]
                     st.dataframe(df[available_cols], use_container_width=True)
                 else:
                     st.write("No songs retrieved.")
@@ -944,5 +1370,5 @@ with st.sidebar:
     """)
     
     st.markdown("---")
-    st.markdown("**Note:** This demo uses static retrieval. In production, it connects to a Neo4j GraphRAG database.")
+    st.markdown("**Note:** This demo connects to a Neo4j GraphRAG database for song retrieval.")
 
