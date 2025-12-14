@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[6]:
-
-
 import os
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
@@ -32,9 +29,6 @@ uri = os.environ.get("NEO4J_URI")
 username = os.environ.get("NEO4J_USERNAME")
 password = os.environ.get("NEO4J_PASSWORD")
 driver = GraphDatabase.driver(uri, auth=(username, password))
-
-
-# In[ ]:
 
 
 def embed_text(text):
@@ -195,21 +189,6 @@ def artist_genre_filter(driver, params):
 
 
 def track_genre_filter(driver, params):
-    # q = """
-    # UNWIND $track_genre_keywords AS kw
-    # CALL {
-    #     WITH kw
-    #     CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
-    #     RETURN node ORDER BY score DESC LIMIT 1
-    # }
-    # WITH collect(distinct node) AS top_nodes
-    # UNWIND top_nodes AS node
-    # MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
-    # WITH collect(distinct sub) AS allowed
-    # MATCH (t:Track)-[:HAS_GENRE]->(g:Genre)
-    # WHERE g IN allowed
-    # RETURN elementId(t) AS id
-    # """
     q = """
     UNWIND $track_genre_keywords AS kw
     CALL (kw) {
@@ -242,24 +221,7 @@ def features_filter(driver, params):
     """
     return run_query(driver, q, params)
 
-# def album_filter(driver, params):
-#     q = """
-#     MATCH (t:Track)-[:APPEARS_ON]->(alb:Album)
-#     WHERE
-#         ($album_views_from IS NULL OR alb.playcount >= $album_views_from)
-#         AND ($album_views_to IS NULL OR alb.playcount <= $album_views_to)
-#         AND (
-#             $album_name_keywords IS NULL OR size($album_name_keywords) = 0 OR $album_name_keywords = [""]
-#             OR EXISTS {
-#                 UNWIND $album_name_keywords AS kw
-#                 CALL db.index.fulltext.queryNodes("album_name_fulltext", kw) YIELD node, score
-#                 WITH node, score ORDER BY score DESC LIMIT 1
-#                 WHERE node = alb
-#             }
-#         )
-#     RETURN elementId(t) AS id
-#     """
-#     return run_query(driver, q, params)
+
 def album_filter(driver, params):
     q = """
     CALL {
@@ -544,9 +506,6 @@ def miwa(input_json, HARD_MATCH=False):
     results = filter_tracks_with_scoring(driver, params)
 
 
-# In[67]:
-
-
 extracted_json =  {
     "track": {
         # "title_keywords": ["father", "son"],
@@ -579,35 +538,6 @@ extracted_json =  {
         "name_keywords": ["fire"],
         "views_from": None,
         "views_to": None
-    }
-}
-
-extracted_json = {
-    "track": {
-        "title_keywords": ["bitch"],
-        "year_from": None,
-        "year_to": None,
-        "genres": [],
-        "views_from": None,
-        "views_to": None,
-        "lyrics_keywords": [],
-        "lyrics_text": ""
-    },
-    "artist": {
-        "name_keywords": [],
-        "founded_year_from": None,
-        "founded_year_to": None,
-        "genres": [],
-        "country": ["United States"],
-        "region": None,
-        "description_keywords": [],
-        "description_text": ""
-    },
-    "features": ["Snoop"],
-    "album": {
-        "name_keywords": [],
-        "views_from": [],
-        "views_to": []
     }
 }
 
