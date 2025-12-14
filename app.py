@@ -37,10 +37,6 @@ username = os.environ.get("NEO4J_USERNAME")
 password = os.environ.get("NEO4J_PASSWORD")
 driver = GraphDatabase.driver(uri, auth=(username, password))
 
-
-# In[ ]:
-
-
 def embed_text(text):
     if text in [None, "", []]:
         return None
@@ -180,21 +176,6 @@ def location_filter(driver, params):
 
 
 def artist_genre_filter(driver, params):
-    # q = """
-    # UNWIND $artist_genre_keywords AS kw
-    # CALL {
-    #     WITH kw
-    #     CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
-    #     RETURN node ORDER BY score DESC LIMIT 1
-    # }
-    # WITH collect(distinct node) AS top_nodes
-    # UNWIND top_nodes AS node
-    # MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
-    # WITH collect(distinct sub) AS allowed
-    # MATCH (t:Track)-[:PERFORMED_BY]->(a:Artist)-[:PERFORMS_GENRE]->(g:Genre)
-    # WHERE g IN allowed
-    # RETURN elementId(t) AS id
-    # """
     q = """
     UNWIND $artist_genre_keywords AS kw
     CALL (kw) {
@@ -215,21 +196,6 @@ def artist_genre_filter(driver, params):
 
 
 def track_genre_filter(driver, params):
-    # q = """
-    # UNWIND $track_genre_keywords AS kw
-    # CALL {
-    #     WITH kw
-    #     CALL db.index.fulltext.queryNodes("genre_fulltext", kw) YIELD node, score
-    #     RETURN node ORDER BY score DESC LIMIT 1
-    # }
-    # WITH collect(distinct node) AS top_nodes
-    # UNWIND top_nodes AS node
-    # MATCH (node)<-[:IS_SUBGENRE*0..]-(sub)
-    # WITH collect(distinct sub) AS allowed
-    # MATCH (t:Track)-[:HAS_GENRE]->(g:Genre)
-    # WHERE g IN allowed
-    # RETURN elementId(t) AS id
-    # """
     q = """
     UNWIND $track_genre_keywords AS kw
     CALL (kw) {
@@ -262,24 +228,6 @@ def features_filter(driver, params):
     """
     return run_query(driver, q, params)
 
-# def album_filter(driver, params):
-#     q = """
-#     MATCH (t:Track)-[:APPEARS_ON]->(alb:Album)
-#     WHERE
-#         ($album_views_from IS NULL OR alb.playcount >= $album_views_from)
-#         AND ($album_views_to IS NULL OR alb.playcount <= $album_views_to)
-#         AND (
-#             $album_name_keywords IS NULL OR size($album_name_keywords) = 0 OR $album_name_keywords = [""]
-#             OR EXISTS {
-#                 UNWIND $album_name_keywords AS kw
-#                 CALL db.index.fulltext.queryNodes("album_name_fulltext", kw) YIELD node, score
-#                 WITH node, score ORDER BY score DESC LIMIT 1
-#                 WHERE node = alb
-#             }
-#         )
-#     RETURN elementId(t) AS id
-#     """
-#     return run_query(driver, q, params)
 def album_filter(driver, params):
     q = """
     CALL {
@@ -508,8 +456,6 @@ def filter_tracks_with_scoring(driver, p):
 
     return top15
 
-
-
 def pretty_print_full(result):
     print("\n================ TRACK ==================")
     print(f"🎯 Score: {result['score_total']}")
@@ -527,10 +473,6 @@ def pretty_print_full(result):
 
     print(f"💿 Album: {result.get('album_name', 'N/A')}")
     print(f"🔥 Album Playcount: {result.get('album_playcount', 'N/A')}")
-
-
-# In[46]:
-
 
 def parse_parameters(input_json, HARD_MATCH=False):
     track = input_json.get("track", {}) or {}
