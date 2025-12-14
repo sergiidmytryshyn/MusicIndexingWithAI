@@ -212,3 +212,5 @@ data_parsing/*/*.csv
 stuff
 .DS_Store
 .env
+
+results/*
